@@ -41,6 +41,7 @@ body {
   text-overflow: ellipsis;
   border: 1px solid #222;
   background: #eee;
+  text-align: center;
 }
 
 .numeric {
