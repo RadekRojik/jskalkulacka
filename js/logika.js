@@ -75,6 +75,10 @@ function swipe(element, treeshold){
   startY = e.touches[0].clientY;
   }, { passive: false });
 
+element.addEventListener("touchmove", e => {
+  e.preventDefault();
+}, { passive: false });
+
   element.addEventListener("touchend", e => {
     const endX = e.changedTouches[0].clientX;
     const endY = e.changedTouches[0].clientY;
