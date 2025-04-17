@@ -73,7 +73,7 @@ function swipe(element, treeshold){
   element.addEventListener("touchstart", e => {
   startX = e.touches[0].clientX;
   startY = e.touches[0].clientY;
-  }, { passive: true });
+  }, { passive: false });
 
   element.addEventListener("touchend", e => {
     const endX = e.changedTouches[0].clientX;
@@ -91,7 +91,7 @@ function swipe(element, treeshold){
       //   console.log(deltaY < 0 ? "nahoru" : "dolu");
       //   return;
       };
-  }, { passive: true });
+  }, { passive: false });
 };
 
 // ======== START =========
