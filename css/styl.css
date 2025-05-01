@@ -30,11 +30,13 @@ body {
 #klavesnice {
   flex: 1;
   touch-action: none;
-  user-select: none;
   /* zbytek výšky */
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   grid-auto-rows: 1fr;
+}
+#klavesnice * {
+  user-select: none;
 }
 
 #klavesnice button {
