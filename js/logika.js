@@ -56,7 +56,7 @@ function vykresliKlavesnici(layoutNazev) {
     btn.style.gridRow = `span ${def.rowSpan ?? 1}`;
     btn.style.gridColumn = `span ${def.colSpan ?? 1}`;
 
-    btn.addEventListener("click", () => {
+    btn.addEventListener("pointerdown", () => {
     try {
       funkce[def.fn](def.name); // přímé volání jako ve slovníku
     } catch (err) {
