@@ -3,6 +3,7 @@ import { layouty } from './layout.js';
 const layoutNazvy = Object.keys(layouty);
 let aktivniIndex = 0;
 let DES_MIST = 4;
+const vystup = document.getElementById("vystup");
 
 // ======== FUNKCE =========
 
@@ -16,7 +17,7 @@ function spocitej() {
   const vstup = document.getElementById("vstup");
   try {
     let vysledek  = math.evaluate(vstup.value);
-    vstup.value = formatVysledek(vysledek, DES_MIST);
+    vystup.textContent = formatVysledek(vysledek, DES_MIST);
   } catch {
     vstup.value = "ERR";
   }
