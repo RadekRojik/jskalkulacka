@@ -7,7 +7,7 @@ let aktivniIndex = 0;
 
 function vlozText(hodnota) {
   const vstup = document.getElementById("vstup");
-  vstup.value += hodnota;
+  vstup.value += hodnota.name;
   vstup.scrollLeft = vstup.scrollWidth;
 };
 
@@ -55,19 +55,28 @@ function vykresliKlavesnici(layoutNazev) {
     btn.className = def.cssClass;
     btn.style.gridRow = `span ${def.rowSpan ?? 1}`;
     btn.style.gridColumn = `span ${def.colSpan ?? 1}`;
+    btn.def = def;
 
-    btn.addEventListener("pointerdown", () => {
-    try {
-      funkce[def.fn](def.name); // přímé volání jako ve slovníku
-    } catch (err) {
-      console.error("Chyba při volání funkce:", def.fn, err);
-    };
+  //   btn.addEventListener("pointerdown", () => {
+  //   try {
+  //     // funkce[def.fn](def.name); // přímé volání jako ve slovníku
+  //     funkce[def.fn](def); // přímé volání jako ve slovníku
+  //   } catch (err) {
+  //     console.error("Chyba při volání funkce:", def.fn, err);
+  //   };
 
-  });
+  // });
     kontejner.appendChild(btn);
   });
 };
-  
+
+function zpracujTap(target) {
+  const def = target?.def;
+  if (!def) return;
+  const f = funkce[def.fn];
+  if (typeof f === "function") f(def);
+}
+
 function swipe(element, treeshold){
   let startX, startY;
   element.addEventListener("touchstart", e => {
@@ -84,7 +93,9 @@ element.addEventListener("touchmove", e => {
     const endY = e.changedTouches[0].clientY;
     const deltaX = endX - startX;
     const deltaY = endY - startY;
-    if (Math.abs(Math.hypot(deltaX, deltaY)) < treeshold) return;
+    if (Math.abs(Math.hypot(deltaX, deltaY)) < treeshold) {
+      zpracujTap(e.target);
+      return;};
     // const pomer = Math.abs(deltaY / deltaX);
     // if (pomer < 1){
     if (Math.abs(deltaX) > Math.abs(deltaY)){
