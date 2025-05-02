@@ -19,9 +19,16 @@ body {
 }
 
 #vstup {
+  overflow-x: auto;
+  white-space: nowrap;
+  text-align: right;
+  direction: ltr;
+  user-select: text;
+  -webkit-user-select: text;
+  -webkit-overflow-scrolling: touch;
+  /* iOS */
   width: 90%;
   font-size: var(--velikost-pisma);
-  text-align: right;
   background: transparent;
   border: none;
   color: white;

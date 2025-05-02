@@ -2,6 +2,7 @@ import { layouty } from './layout.js';
 
 const layoutNazvy = Object.keys(layouty);
 let aktivniIndex = 0;
+let DES_MIST = 4;
 
 // ======== FUNKCE =========
 
@@ -14,7 +15,8 @@ function vlozText(hodnota) {
 function spocitej() {
   const vstup = document.getElementById("vstup");
   try {
-    vstup.value = math.evaluate(vstup.value);
+    let vysledek  = math.evaluate(vstup.value);
+    vstup.value = formatVysledek(vysledek, DES_MIST);
   } catch {
     vstup.value = "ERR";
   }
@@ -26,6 +28,11 @@ function smaz() {
 };
 
 // ======== Konec funkcí =========
+
+function formatVysledek(vysledek, desMist) {
+  if (Number.isInteger(vysledek)) return vysledek;
+  return +vysledek.toFixed(desMist);
+}
 
 
 function zmenLayout(smer) {
@@ -79,18 +86,22 @@ function zpracujTap(target) {
 
 function swipe(element, treeshold){
   let startX, startY;
-  element.addEventListener("touchstart", e => {
-  startX = e.touches[0].clientX;
-  startY = e.touches[0].clientY;
+  element.addEventListener("pointerdown", e => {
+  // startX = e.touches[0].clientX;
+  // startY = e.touches[0].clientY;
+  startX = e.clientX;
+  startY = e.clientY;
   }, { passive: false });
 
-element.addEventListener("touchmove", e => {
-  e.preventDefault();
-}, { passive: false });
+// element.addEventListener("touchmove", e => {
+//   e.preventDefault();
+// }, { passive: false });
 
-  element.addEventListener("touchend", e => {
-    const endX = e.changedTouches[0].clientX;
-    const endY = e.changedTouches[0].clientY;
+  element.addEventListener("pointerup", e => {
+    // const endX = e.changedTouches[0].clientX;
+    // const endY = e.changedTouches[0].clientY;
+    const endX = e.clientX;
+    const endY = e.clientY;
     const deltaX = endX - startX;
     const deltaY = endY - startY;
     if (Math.abs(Math.hypot(deltaX, deltaY)) < treeshold) {
