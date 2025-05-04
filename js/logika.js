@@ -2,30 +2,51 @@ import { layouty } from './layout.js';
 
 const layoutNazvy = Object.keys(layouty);
 let aktivniIndex = 0;
+let ctrlPressed = false;
+let isSimulatedDown = false;
+let stopTimeout;
 let DES_MIST = 4;
-const vystup = document.getElementById("vystup");
+let treshold = 50;
+let startX, startY = null;
+let holdTimeout;
+const vstup = document.getElementById("vstup");
+const kontejner = document.getElementById("klavesnice");
+
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    spocitej();
+  };
+  if (e.key === "Control") ctrlPressed = true;
+});
+
+document.addEventListener("keyup", (e) => {
+  if (e.key === "Control") ctrlPressed = false;
+});
 
 // ======== FUNKCE =========
 
 function vlozText(hodnota) {
-  const vstup = document.getElementById("vstup");
-  vstup.value += hodnota.name;
+  vstup.textContent += hodnota.name;
   vstup.scrollLeft = vstup.scrollWidth;
 };
 
 function spocitej() {
-  const vstup = document.getElementById("vstup");
   try {
-    let vysledek  = math.evaluate(vstup.value);
-    vystup.textContent = formatVysledek(vysledek, DES_MIST);
+    let vysledek = math.evaluate(vstup.textContent);
+    vstup.textContent = formatVysledek(vysledek, DES_MIST);
   } catch {
-    vstup.value = "ERR";
+    vstup.textContent = "ERR";
   }
 };
 
+function del() {
+  vstup.textContent = vstup.textContent.slice(0, -1);
+}
+
 function smaz() {
-  const vstup = document.getElementById("vstup");
-  vstup.value = "";
+  vstup.textContent = "0";
 };
 
 // ======== Konec funkcí =========
@@ -46,10 +67,10 @@ const funkce = {
   vlozText,
   spocitej,
   smaz,
+  del,
 };
 
 
-const kontejner = document.getElementById("klavesnice");
 
 function vykresliKlavesnici(layoutNazev) {
   kontejner.innerHTML = "";
@@ -64,16 +85,6 @@ function vykresliKlavesnici(layoutNazev) {
     btn.style.gridRow = `span ${def.rowSpan ?? 1}`;
     btn.style.gridColumn = `span ${def.colSpan ?? 1}`;
     btn.def = def;
-
-  //   btn.addEventListener("pointerdown", () => {
-  //   try {
-  //     // funkce[def.fn](def.name); // přímé volání jako ve slovníku
-  //     funkce[def.fn](def); // přímé volání jako ve slovníku
-  //   } catch (err) {
-  //     console.error("Chyba při volání funkce:", def.fn, err);
-  //   };
-
-  // });
     kontejner.appendChild(btn);
   });
 };
@@ -85,46 +96,94 @@ function zpracujTap(target) {
   if (typeof f === "function") f(def);
 }
 
-function swipe(element, treeshold){
-  let startX, startY;
-  element.addEventListener("pointerdown", e => {
-  // startX = e.touches[0].clientX;
-  // startY = e.touches[0].clientY;
+function zpracujPodrzeni(target) {
+  // console.log(target.textContent);
+  const def = target?.def;
+  if (!def) return;
+  const f = funkce[def.fn1];
+  if (typeof f === "function") f(def);
+  // console.log("fn1:", def.fn1);
+  // console.log("funkce[fn1]:", funkce[def.fn1]);
+
+}
+
+
+kontejner.addEventListener("pointermove", (e) => {
+  if (!ctrlPressed) return;
+
+  if (!isSimulatedDown) {
+    emitSimulatedEvent("pointerdown", e);
+    isSimulatedDown = true;
+  }
+
+  clearTimeout(stopTimeout);
+  stopTimeout = setTimeout(() => {
+    if (isSimulatedDown) {
+      emitSimulatedEvent("pointerup", e);
+      isSimulatedDown = false;
+    }
+  }, 200);
+});
+
+function emitSimulatedEvent(type, original) {
+  const simulated = new PointerEvent(type, {
+    bubbles: true,
+    clientX: original.clientX,
+    clientY: original.clientY,
+    pointerId: original.pointerId,
+    pointerType: original.pointerType,
+    ctrlKey: true,
+    buttons: original.buttons,
+  });
+
+  original.target.dispatchEvent(simulated);
+}
+
+
+// #######################################
+// fce swipe
+// –––––––––––––––––––––––––––––––––––––––
+
+kontejner.addEventListener("pointerdown", e => {
   startX = e.clientX;
   startY = e.clientY;
-  }, { passive: false });
+  // let tapAktivni = true;
 
-// element.addEventListener("touchmove", e => {
-//   e.preventDefault();
-// }, { passive: false });
+  holdTimeout = setTimeout(() => {
+    // tapAktivni = false;
+    zpracujPodrzeni(e.target);
+  }, 400);
+},
+  { passive: false }
+);
 
-  element.addEventListener("pointerup", e => {
-    // const endX = e.changedTouches[0].clientX;
-    // const endY = e.changedTouches[0].clientY;
-    const endX = e.clientX;
-    const endY = e.clientY;
-    const deltaX = endX - startX;
-    const deltaY = endY - startY;
-    if (Math.abs(Math.hypot(deltaX, deltaY)) < treeshold) {
-      zpracujTap(e.target);
-      return;};
-    // const pomer = Math.abs(deltaY / deltaX);
-    // if (pomer < 1){
-    if (Math.abs(deltaX) > Math.abs(deltaY)){
-        // console.log(deltaX < 0 ? "vlevo" : "vpravo");
-        zmenLayout(deltaX < 0 ? -1 : 1);
-        return;
-      // }else{
-      //   console.log(deltaY < 0 ? "nahoru" : "dolu");
-      //   return;
-      };
-  }, { passive: false });
-};
+
+kontejner.addEventListener("pointerup", e => {
+  clearTimeout(holdTimeout);
+  const endX = e.clientX;
+  const endY = e.clientY;
+  const deltaX = endX - startX;
+  const deltaY = endY - startY;
+
+  if ((Math.abs(Math.hypot(deltaX, deltaY)) < treshold) && !ctrlPressed) {
+    zpracujTap(e.target);
+    return;
+  };
+
+  if (Math.abs(deltaX) > Math.abs(deltaY)) {
+    // console.log(deltaX < 0 ? "vlevo" : "vpravo");
+    zmenLayout(deltaX < 0 ? -1 : 1);
+    return;
+    }else{
+    //   console.log(deltaY < 0 ? "nahoru" : "dolu");
+    deltaY < 0 ? spocitej() : vlozText({name: '+'});
+      return;
+  };
+},
+  { passive: false }
+);
 
 // ======== START =========
 vykresliKlavesnici("default");
-swipe(kontejner, 50);
+// swipe(kontejner, 50);
 
-// test objektů
-// console.log("********", Object.keys(layouty)[1]);
-// console.log("############", layouty[1]);

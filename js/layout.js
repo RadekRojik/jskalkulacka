@@ -21,6 +21,7 @@ export const layouty = {
       { name: "+", fn: "vlozText", cssClass: "function" },
       { name: "=", fn: "spocitej", cssClass: "function", rowSpan: 2 },
       { name: "C", fn: "smaz", cssClass: "other" },
+      { name: "⌫", fn: "del", fn1: "smaz", cssClass: "other" },
     ],
   },
 
