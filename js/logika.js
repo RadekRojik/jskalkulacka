@@ -28,6 +28,9 @@ document.addEventListener("keyup", (e) => {
 // ======== FUNKCE =========
 
 function vlozText(hodnota) {
+  if (vstup.textContent.trim() == "0"){
+    vstup.textContent = "";
+  }
   vstup.textContent += hodnota.name;
   vstup.scrollLeft = vstup.scrollWidth;
 };
@@ -42,7 +45,7 @@ function spocitej() {
 };
 
 function del() {
-  vstup.textContent = vstup.textContent.slice(0, -1);
+  vstup.textContent = vstup.textContent.trim() != "0" ? vstup.textContent.slice(0, -1) : "0";
 }
 
 function smaz() {
