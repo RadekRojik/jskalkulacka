@@ -9,6 +9,7 @@ let DES_MIST = 4;
 let treshold = 50;
 let startX, startY = null;
 let holdTimeout;
+let pamet = {};
 const vstup = document.getElementById("vstup");
 const kontejner = document.getElementById("klavesnice");
 
@@ -52,7 +53,6 @@ function vlozText(hodnota) {
 
 function spocitej() {
   try {
-    const pamet = {};
     let vysledek = math.evaluate(vstup.textContent.replace(/✕/g, '*'), pamet);
     vstup.textContent = formatVysledek(vysledek, DES_MIST);
   } catch {
