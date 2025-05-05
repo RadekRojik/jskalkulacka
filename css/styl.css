@@ -54,7 +54,7 @@ body {
 
 #vstup,
 #vystup {
-  font-size: var(--velikost-pisma);
+  font-size: calc(var(--velikost-pisma) * 1.05);
   text-align: right;
   font-weight: bold;
   background: transparent;
