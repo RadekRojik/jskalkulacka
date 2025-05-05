@@ -106,6 +106,7 @@ function vykresliKlavesnici(layoutNazev) {
     btn.classList.add("key-button", def.cssClass);
     btn.style.gridRow = `span ${def.rowSpan ?? 1}`;
     btn.style.gridColumn = `span ${def.colSpan ?? 1}`;
+    if (def.colSpan > 1) btn.classList.add("wide");
     btn.def = def;
     btn.addEventListener("pointerdown", () => {
       btn.holdFired = false;
