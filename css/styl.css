@@ -44,6 +44,7 @@ body {
   /*height: 30%;*/
   flex: 1 1 auto;
   display: flex;
+  max-height: 50dvh;
   flex-direction: column;
   justify-content: center;
   background: var(--bg-displej);
