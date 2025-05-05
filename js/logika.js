@@ -52,7 +52,8 @@ function vlozText(hodnota) {
 
 function spocitej() {
   try {
-    let vysledek = math.evaluate(vstup.textContent.replace(/✕/g, '*'));
+    const pamet = {};
+    let vysledek = math.evaluate(vstup.textContent.replace(/✕/g, '*'), pamet);
     vstup.textContent = formatVysledek(vysledek, DES_MIST);
   } catch {
     vstup.textContent = "Chyba!";
