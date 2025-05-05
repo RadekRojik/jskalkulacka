@@ -87,7 +87,7 @@ body {
 #klavesnice * {
   user-select: none;
   -webkit-user-select: none;
-  touch-action: manipulation;
+  touch-action: none;
 }
 
 .numeric {
