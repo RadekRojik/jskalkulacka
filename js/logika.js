@@ -55,9 +55,7 @@ function spocitej() {
   try {
     const vyrazy = vstup.textContent.replace(/✕/g, '*');
     const vysledek = math.evaluate(vyrazy, pamet);
-    vstup.textContent = formatVysledek(
-      Array.isArray(vysledek) ? vysledek.at(-1) : vysledek,
-      DES_MIST;
+    vstup.textContent = formatVysledek(Array.isArray(vysledek) ? vysledek.at(-1) : vysledek,DES_MIST);
   } catch {
     vstup.textContent = "Chyba!";
   }
