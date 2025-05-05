@@ -42,6 +42,7 @@ body {
 
 #displej {
   /*height: 30%;*/
+  font-size: var(--velikost-pisma);
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
