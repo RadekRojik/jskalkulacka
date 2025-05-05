@@ -53,8 +53,11 @@ function vlozText(hodnota) {
 
 function spocitej() {
   try {
-    let vysledek = math.evaluate(vstup.textContent.replace(/✕/g, '*'), pamet);
-    vstup.textContent = formatVysledek(vysledek, DES_MIST);
+    const vyrazy = vstup.textContent.replace(/✕/g, '*');
+    const vysledek = math.evaluate(vyrazy, pamet);
+    vstup.textContent = formatVysledek(
+      Array.isArray(vysledek) ? vysledek.at(-1) : vysledek,
+      DES_MIST;
   } catch {
     vstup.textContent = "Chyba!";
   }
