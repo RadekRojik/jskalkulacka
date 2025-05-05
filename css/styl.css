@@ -42,7 +42,6 @@ body {
 
 #displej {
   /*height: 30%;*/
-  font-size: var(--velikost-pisma);
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
@@ -54,7 +53,7 @@ body {
 
 #vstup,
 #vystup {
-  font-size: calc(var(--velikost-pisma) * 1.05);
+  font-size: calc(var(--velikost-pisma) * 1.1);
   text-align: right;
   font-weight: bold;
   background: transparent;
