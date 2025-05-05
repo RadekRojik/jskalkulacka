@@ -12,6 +12,21 @@ let holdTimeout;
 const vstup = document.getElementById("vstup");
 const kontejner = document.getElementById("klavesnice");
 
+const temata = ["light", "dark", "ocean"];
+let aktualniTema = 0;
+
+function cyklickeTema() {
+  aktualniTema = (aktualniTema + 1) % temata.length;
+  document.documentElement.setAttribute("data-theme", temata[aktualniTema]);
+  localStorage.setItem("tema", temata[aktualniTema]);
+}
+
+const ulozene = localStorage.getItem("tema");
+if (ulozene && temata.includes(ulozene)) {
+  aktualniTema = temata.indexOf(ulozene);
+  document.documentElement.setAttribute("data-theme", ulozene);
+}
+
 
 document.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
@@ -28,7 +43,7 @@ document.addEventListener("keyup", (e) => {
 // ======== FUNKCE =========
 
 function vlozText(hodnota) {
-  if (vstup.textContent.trim() == "0"){
+  if (vstup.textContent.trim() == "0") {
     vstup.textContent = "";
   }
   vstup.textContent += hodnota.name;
@@ -37,10 +52,10 @@ function vlozText(hodnota) {
 
 function spocitej() {
   try {
-    let vysledek = math.evaluate(vstup.textContent);
+    let vysledek = math.evaluate(vstup.textContent.replace(/✕/g, '*'));
     vstup.textContent = formatVysledek(vysledek, DES_MIST);
   } catch {
-    vstup.textContent = "ERR";
+    vstup.textContent = "Chyba!";
   }
 };
 
@@ -71,6 +86,7 @@ const funkce = {
   spocitej,
   smaz,
   del,
+  cyklickeTema,
 };
 
 
@@ -83,25 +99,53 @@ function vykresliKlavesnici(layoutNazev) {
 
   layout.keys.forEach((def) => {
     const btn = document.createElement("button");
-    btn.textContent = def.name;
-    btn.className = def.cssClass;
+    // btn.textContent = def.name;
+    btn.innerHTML = `<span class="key-main">${def.name}</span>`;
+    btn.innerHTML += def.name1 ? `<span class="key-alt">${def.name1}</span>` : "";
+    // btn.className = def.cssClass;
+    btn.classList.add("key-button", def.cssClass);
     btn.style.gridRow = `span ${def.rowSpan ?? 1}`;
     btn.style.gridColumn = `span ${def.colSpan ?? 1}`;
     btn.def = def;
+    btn.addEventListener("pointerdown", () => {
+      btn.holdFired = false;
+      btn.holdTimeout = setTimeout(() => {
+        btn.holdFired = true;
+        btn.classList.add("show-alt");
+      }, 300);
+    });
+
+    btn.addEventListener("pointerup", () => {
+      clearTimeout(btn.holdTimeout);
+      btn.classList.remove("show-alt");
+    });
+
+    btn.addEventListener("pointerleave", () => {
+      clearTimeout(btn.holdTimeout);
+      btn.classList.remove("show-alt");
+    });
+
+    btn.addEventListener("pointercancel", () => {
+      clearTimeout(btn.holdTimeout);
+      btn.classList.remove("show-alt");
+    });
+
     kontejner.appendChild(btn);
   });
 };
 
+
 function zpracujTap(target) {
-  const def = target?.def;
+  const btn = target.closest("button");
+  const def = btn?.def;
   if (!def) return;
   const f = funkce[def.fn];
   if (typeof f === "function") f(def);
 }
 
 function zpracujPodrzeni(target) {
-  // console.log(target.textContent);
-  const def = target?.def;
+  const btn = target.closest("button");
+  const def = btn?.def;
   if (!def) return;
   const f = funkce[def.fn1];
   if (typeof f === "function") f(def);
@@ -177,10 +221,10 @@ kontejner.addEventListener("pointerup", e => {
     // console.log(deltaX < 0 ? "vlevo" : "vpravo");
     zmenLayout(deltaX < 0 ? -1 : 1);
     return;
-    }else{
+  } else {
     //   console.log(deltaY < 0 ? "nahoru" : "dolu");
-    deltaY < 0 ? spocitej() : vlozText({name: '+'});
-      return;
+    deltaY < 0 ? spocitej() : vlozText({ name: '+' });
+    return;
   };
 },
   { passive: false }
