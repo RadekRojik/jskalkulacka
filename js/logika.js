@@ -1,5 +1,12 @@
 import { layouty } from './layout.js';
 
+
+
+const math = window.math;
+
+const pamet = {};
+
+
 const layoutNazvy = Object.keys(layouty);
 let aktivniIndex = 0;
 let ctrlPressed = false;
@@ -9,7 +16,6 @@ let DES_MIST = 4;
 let treshold = 50;
 let startX, startY = null;
 let holdTimeout;
-let pamet = {};
 const vstup = document.getElementById("vstup");
 const kontejner = document.getElementById("klavesnice");
 
@@ -53,11 +59,24 @@ function vlozText(hodnota) {
 
 function spocitej() {
   try {
-    const vyrazy = vstup.textContent.replace(/✕/g, '*');
-    const vysledek = math.evaluate(vyrazy, pamet);
-    vstup.textContent = formatVysledek(Array.isArray(vysledek) ? vysledek.at(-1) : vysledek,DES_MIST);
-  } catch {
+    const vyrazy = vstup.textContent
+      .replace(/\u00A0/g, ' ')   // nahraď nedělitelné mezery
+      .replace(/✕/g, '*')        // nahraď znak násobení
+      .trim();                   // odstraň přebytečné mezery
+    let vysledek = math.evaluate(vyrazy, pamet);
+
+    console.log(vysledek);
+    if (vysledek && vysledek.entries) {
+      vysledek = vysledek.entries;
+    }
+
+    const final = Array.isArray(vysledek) ? vysledek.at(-1) : vysledek;
+
+    vstup.textContent = math.format(final, DES_MIST);
+
+  } catch (e) {
     vstup.textContent = "Chyba!";
+    console.warn("Chyba ve výrazu:", e.message);
   }
 };
 
@@ -71,10 +90,7 @@ function smaz() {
 
 // ======== Konec funkcí =========
 
-function formatVysledek(vysledek, desMist) {
-  if (Number.isInteger(vysledek)) return vysledek;
-  return +vysledek.toFixed(desMist);
-}
+
 
 
 function zmenLayout(smer) {
