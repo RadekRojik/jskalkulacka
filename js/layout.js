@@ -26,7 +26,7 @@ export const layouty = {
   },
 
   scientific: {
-    columns: 5,
+    columns: 4,
     keys: [
       { name: "sin", fn: "vlozText", cssClass: "function" },
       { name: "cos", fn: "vlozText", cssClass: "function" },
