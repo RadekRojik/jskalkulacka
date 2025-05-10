@@ -66,7 +66,7 @@ document.addEventListener("keyup", (e) => {
 // ======== FUNKCE =========
 
 function vlozText(hodnota) {
-  vstup.focus();
+  // vstup.focus();
   if (vstup.textContent.trim() == "0") {
     vstup.textContent = "";
   }
