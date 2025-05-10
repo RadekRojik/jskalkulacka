@@ -66,6 +66,7 @@ document.addEventListener("keyup", (e) => {
 // ======== FUNKCE =========
 
 function vlozText(hodnota) {
+  vstup.focus();
   if (vstup.textContent.trim() == "0") {
     vstup.textContent = "";
   }
@@ -258,32 +259,59 @@ kontejner.addEventListener("pointerdown", e => {
   { passive: false }
 );
 
+["pointerup", "pointercancel", "pointerleave"].forEach((typ) => {
+  kontejner.addEventListener(typ, (e) => {
+    clearTimeout(holdTimeout);
+    aktivniBtn?.classList.remove("show-alt");
 
-kontejner.addEventListener("pointerup", e => {
-  clearTimeout(holdTimeout);
-  const endX = e.clientX;
-  const endY = e.clientY;
-  const deltaX = endX - startX;
-  const deltaY = endY - startY;
-  aktivniBtn.classList.remove("show-alt");
+    const endX = e.clientX;
+    const endY = e.clientY;
+    const deltaX = endX - startX;
+    const deltaY = endY - startY;
 
-  if ((Math.abs(Math.hypot(deltaX, deltaY)) < treshold) && !ctrlPressed) {
-    zpracujTap(aktivniBtn);
-    return;
-  };
+    if (typ === "pointerup" && (Math.abs(Math.hypot(deltaX, deltaY)) < treshold) && !ctrlPressed) {
+      zpracujTap(aktivniBtn);
+      return;
+    }
 
-  if (Math.abs(deltaX) > Math.abs(deltaY)) {
+    if (typ === "pointerup") {
+      if (Math.abs(deltaX) > Math.abs(deltaY)) {
     // console.log(deltaX < 0 ? "vlevo" : "vpravo");
-    zmenLayout(deltaX < 0 ? -1 : 1);
-    return;
-  } else {
+        zmenLayout(deltaX < 0 ? -1 : 1);
+      } else {
     //   console.log(deltaY < 0 ? "nahoru" : "dolu");
-    deltaY < 0 ? spocitej() : vlozText({ name: '+' });
-    return;
-  };
-},
-  { passive: false }
-);
+        deltaY < 0 ? spocitej() : vlozText({ name: '+' });
+      }
+    }
+  }, { passive: false });
+});
+
+
+// kontejner.addEventListener("pointerup", e => {
+//   clearTimeout(holdTimeout);
+//   const endX = e.clientX;
+//   const endY = e.clientY;
+//   const deltaX = endX - startX;
+//   const deltaY = endY - startY;
+//   aktivniBtn.classList.remove("show-alt");
+
+//   if ((Math.abs(Math.hypot(deltaX, deltaY)) < treshold) && !ctrlPressed) {
+//     zpracujTap(aktivniBtn);
+//     return;
+//   };
+
+//   if (Math.abs(deltaX) > Math.abs(deltaY)) {
+//     // console.log(deltaX < 0 ? "vlevo" : "vpravo");
+//     zmenLayout(deltaX < 0 ? -1 : 1);
+//     return;
+//   } else {
+//     //   console.log(deltaY < 0 ? "nahoru" : "dolu");
+//     deltaY < 0 ? spocitej() : vlozText({ name: '+' });
+//     return;
+//   };
+// },
+//   { passive: false }
+// );
 
 // ======== START =========
 vykresliKlavesnici("default");
