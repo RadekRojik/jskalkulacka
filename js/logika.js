@@ -9,13 +9,14 @@ let treshold = 50;
 let startX, startY = null;
 let holdTimeout;
 let stopTimeout;
-let alt = false;
+let altSymbol = false;
 let tapAktivni = true;
 let aktivniBtn = null;
 let aktualniTema = 0;
+let mazat = false; // rozhoduje o automatickém mazání displeje
 
 const math = window.math;
-const pamet = {};
+const pamet = {}; // globální scope
 const layoutNazvy = Object.keys(layouty);
 const vstup = document.getElementById("vstup");
 const kontejner = document.getElementById("klavesnice");
@@ -67,12 +68,18 @@ document.addEventListener("keyup", (e) => {
 
 function vlozText(hodnota) {
   // vstup.focus();
+  const znamenka = ["+","-","*","/","✕"];
+  const kvlozeni = altSymbol ? hodnota?.name1 : hodnota.name;
+  znamenka.forEach((zn) => {
+    if (zn == kvlozeni) mazat=false;
+  });
+  mazat ? smaz() : (()=>{})();
   if (vstup.textContent.trim() == "0") {
     vstup.textContent = "";
   }
-  vstup.textContent += alt ? hodnota?.name1 : hodnota.name;
+  vstup.textContent += kvlozeni;
   vstup.scrollLeft = vstup.scrollWidth;
-  alt = false;
+  altSymbol = false;
 };
 
 function vypisPamet(scope) {
@@ -103,6 +110,9 @@ function smazat(jmeno, scope) {
   }
 }
 
+function nastaveni(){
+  window.location.href = "nastaveni.html";
+  }
 
 function spocitej() {
   try {
@@ -131,17 +141,21 @@ function spocitej() {
       vysledek = math.format(vysledek, { precision: DES_MIST });
     }
     vstup.textContent = String(vysledek ?? 0);
+    mazat = true;
   } catch (err) {
     vstup.textContent = `Chyba: ${err.message}`;
+    mazat = true;
   }
 }
 
 function del() {
   vstup.textContent = vstup.textContent.trim() != "0" ? vstup.textContent.slice(0, -1) : "0";
+  if (mazat) smaz();
 }
 
 function smaz() {
   vstup.textContent = "0";
+  mazat = false;
 }
 
 // ======== Konec funkcí =========
@@ -156,6 +170,7 @@ const funkce = {
   smaz,
   del,
   cyklickeTema,
+  nastaveni,
 }
 
 
@@ -204,7 +219,7 @@ function zpracujPodrzeni(target) {
   const def = btn?.def;
   if (!def) return;
   const f = funkce[def.fn1 ? def.fn1 : def.fn];
-  alt = def.name1 ? true : false;
+  altSymbol = def.name1 ? true : false;
   if (typeof f === "function") f(def);
 }
 
