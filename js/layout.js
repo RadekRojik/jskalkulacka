@@ -18,7 +18,7 @@ export const layouty = {
       { name: "-", fn: "vlozText", cssClass: "function" },
       { name: "0", fn: "vlozText", cssClass: "numeric" },
       { name: ".", fn: "vlozText", cssClass: "other" },
-      { name: "S", fn: "nastaveni", cssClass: "other" },
+      { name: "S", fn: "cyklickeTema", cssClass: "other" },
       { name: "+", fn: "vlozText", cssClass: "function" },
       { name: "↩", fn: "del", fn1: "smaz", cssClass: "other" },
       { name: "=", name1: "Ans", fn: "spocitej", cssClass: "function", colSpan:3},
