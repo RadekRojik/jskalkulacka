@@ -52,4 +52,3 @@ function loadState(obj, keys) {
 }
 
 loadState(innerState, watchprops);
-

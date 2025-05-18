@@ -1,17 +1,16 @@
-import { state, walkTroughArray, temata } from './state.js';
+import { state, walkTroughArray, temata, rezimyUhlu } from './state.js';
 
 
+// Přepínání mezi tématy, cyklicky pořád do kola
 export function cyklickeTema(){
   const dalsi = walkTroughArray(temata, state.tema, 1);
   document.documentElement.setAttribute("data-theme", dalsi);
   state.tema = dalsi;
 }
 
+// Inicializační astavení tématu
 document.documentElement.setAttribute("data-theme", state.tema);
 
-const mozneRezimy = ['rad', 'deg', 'grad'];
-let aktualniIndexUhlu = 0;
-// let aktualniRezimUhlu = mozneRezimy[aktualniIndexUhlu];
 
 export function nastavTrigRezim(pamet, rezim) {
   const primeFunkce = ['sin', 'cos', 'tan', 'sec', 'csc', 'cot'];
@@ -32,22 +31,15 @@ export function nastavTrigRezim(pamet, rezim) {
   // Dvouargumentová atan2
   pamet.atan2 = (y, x) => math.unit(math.atan2(y, x), 'rad').toNumber(rezim);
 
-  state.angle = rezim;
+  //state.angle = rezim;
 }
 
 
-export function mod_uhly() {
-  // posuň index cyklicky
-  aktualniIndexUhlu = (aktualniIndexUhlu + 1) % mozneRezimy.length;
-  aktualniRezimUhlu = mozneRezimy[aktualniIndexUhlu];
-  nastavTrigRezim(state.pamet, aktualniRezimUhlu);
-  // return aktualniRezimUhlu;
+export function mod_uhly(){
+  const dalsi = walkTroughArray(rezimyUhlu, state.angle, 1);
+  state.angle = dalsi;
+  nastavTrigRezim(state.pamet, dalsi);
 }
 
-const uhel = localStorage.getItem("angle");
-if (uhel && mozneRezimy.includes(uhel)) {
-  aktualniIndexUhlu = mozneRezimy.indexOf(uhel);
-  nastavTrigRezim(state.pamet, uhel);
-} else {
-  nastavTrigRezim(state.pamet, state.angle)
-}
+
+nastavTrigRezim(state.pamet, state.angle);
