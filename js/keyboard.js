@@ -35,4 +35,3 @@ export function vykresliKlavesnici(layoutNazev, kontejner) {
   });
 };
 
-// kontejner ? vykresliKlavesnici("default", kontejner) : null ;

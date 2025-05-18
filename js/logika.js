@@ -5,8 +5,6 @@ import { cyklickeTema } from './theming.js';
 import { initEventHandlers } from './events.js';
 import { state } from './state.js';
 
-// let state.DES_MIST = 4;
-// let state.mazat = false;
 
 const math = window.math;
 // const state.pamet = {}; // globální scope
