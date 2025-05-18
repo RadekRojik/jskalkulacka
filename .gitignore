@@ -1,0 +1,6 @@
+# Ignoruj složku build/
+node_modules/
+
+# Ignoruj specifické soubory v rootu
+/*.json
+**/*.ts

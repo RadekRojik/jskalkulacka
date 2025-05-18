@@ -1,78 +1,31 @@
-import { layouty } from './layout.js';
+/// <reference path="./types.d.ts" />
 
+import { initKeyboard, zmenLayout } from './keyboard.js';
+import { cyklickeTema } from './theming.js';
+import { initEventHandlers } from './events.js';
+import { state } from './state.js';
 
-let aktivniIndex = 0;
-let ctrlPressed = false;
-let isSimulatedDown = false;
-let DES_MIST = 4;
-let treshold = 50;
-let startX, startY = null;
-let holdTimeout;
-let stopTimeout;
-let alt = false;
-let tapAktivni = true;
-let aktivniBtn = null;
-let aktualniTema = 0;
+// let state.DES_MIST = 4;
+// let state.mazat = false;
 
 const math = window.math;
-const pamet = {};
-const layoutNazvy = Object.keys(layouty);
+// const state.pamet = {}; // globální scope
 const vstup = document.getElementById("vstup");
 const kontejner = document.getElementById("klavesnice");
-const temata = ["light", "dark", "ocean"];
-
-
-// ======== Přepínání témat ========
-
-function cyklickeTema() {
-  aktualniTema = (aktualniTema + 1) % temata.length;
-  document.documentElement.setAttribute("data-theme", temata[aktualniTema]);
-  localStorage.setItem("tema", temata[aktualniTema]);
-}
-
-const ulozene = localStorage.getItem("tema");
-if (ulozene && temata.includes(ulozene)) {
-  aktualniTema = temata.indexOf(ulozene);
-  document.documentElement.setAttribute("data-theme", ulozene);
-}
-
-function zmenLayout(smer) {
-  aktivniIndex = (aktivniIndex + smer + layoutNazvy.length) % layoutNazvy.length;
-  vykresliKlavesnici(layoutNazvy[aktivniIndex]);
-}
-
-// ======== Konec témat ========
-
-
-
-// ======== Listenery na HW klávesnici ========
-
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") {
-    e.preventDefault();
-    spocitej();
-  };
-  if (e.key === "Control") ctrlPressed = true;
-});
-
-document.addEventListener("keyup", (e) => {
-  if (e.key === "Control") ctrlPressed = false;
-});
-
-// ======== Konec HW klávesnice listenerů ========
-
-
-
-// ======== FUNKCE =========
 
 function vlozText(hodnota) {
-  // vstup.focus();
+  const znamenka = ["+","-","*","/","✕"];
+  const kvlozeni = state.altSymbol ? hodnota?.name1 : hodnota.name;
+  znamenka.forEach((zn) => {
+    if (zn == kvlozeni) state.mazat=false;
+  });
+  state.mazat ? smaz() : (()=>{})();
   if (vstup.textContent.trim() == "0") {
     vstup.textContent = "";
   }
-  vstup.textContent += alt ? hodnota?.name1 : hodnota.name;
+  vstup.textContent += kvlozeni;
   vstup.scrollLeft = vstup.scrollWidth;
-  alt = false;
+  state.altSymbol = false;
 };
 
 function vypisPamet(scope) {
@@ -103,6 +56,9 @@ function smazat(jmeno, scope) {
   }
 }
 
+function nastaveni(){
+  window.location.href = "nastaveni.html";
+}
 
 function spocitej() {
   try {
@@ -115,205 +71,87 @@ function spocitej() {
     if (node.type === 'BlockNode') {
       const blocks = node.blocks;
       for (let i = 0; i < blocks.length; i++) {
-        const result = blocks[i].node.evaluate(pamet);
-        // pokud je to poslední výraz, ulož ho jako výsledek
+        const result = blocks[i].node.evaluate(state.pamet);
         if (i === blocks.length - 1) {
           vysledek = result;
         }
       }
     } else {
-      vysledek = node.evaluate(pamet);
+      vysledek = node.evaluate(state.pamet);
       if (node.type === 'AssignmentNode' || node.type === 'FunctionAssignmentNode') {
-        vysledek = 0; // potlačení výstupu
+        vysledek = 0;
       }
     }
     if (vysledek && typeof vysledek.toString === 'function') {
-      vysledek = math.format(vysledek, { precision: DES_MIST });
+      vysledek = math.format(vysledek, { precision: state.DES_MIST });
     }
     vstup.textContent = String(vysledek ?? 0);
+    state.mazat = true;
   } catch (err) {
     vstup.textContent = `Chyba: ${err.message}`;
+    state.mazat = true;
   }
 }
 
 function del() {
   vstup.textContent = vstup.textContent.trim() != "0" ? vstup.textContent.slice(0, -1) : "0";
+  if (state.mazat) smaz();
 }
 
 function smaz() {
   vstup.textContent = "0";
+  state.mazat = false;
 }
 
-// ======== Konec funkcí =========
+
+function nastavTrigRezim(pamet, rezim) {
+  const primeFunkce = ['sin', 'cos', 'tan', 'sec', 'csc', 'cot'];
+  const inverzniFunkce = ['asin', 'acos', 'atan', 'asec', 'acsc', 'acot'];
+
+  const uhel = x => math.unit(x, rezim);
+
+  // Přímé funkce: sin(x) → sin(unit(x, 'deg'))
+  primeFunkce.forEach(jmeno => {
+    pamet[jmeno] = x => math[jmeno](uhel(x));
+  });
+
+  // Inverzní funkce: asin(x) → unit(asin(x), 'deg').value
+  inverzniFunkce.forEach(jmeno => {
+    pamet[jmeno] = x => math.unit(math[jmeno](x), rezim).value;
+  });
+
+  // Dvouargumentová atan2
+  pamet.atan2 = (y, x) => math.unit(math.atan2(y, x), rezim).value;
+}
+
+const mozneRezimy = ['rad', 'deg', 'grad'];
+let aktualniIndexUhlu = 0;
+let aktualniRezimUhlu = mozneRezimy[aktualniIndexUhlu];
+
+function mod_uhly() {
+  // posuň index cyklicky
+  aktualniIndexUhlu = (aktualniIndexUhlu + 1) % mozneRezimy.length;
+  aktualniRezimUhlu = mozneRezimy[aktualniIndexUhlu];
+  nastavTrigRezim(pamet, aktualniRezimUhlu);
+  return aktualniRezimUhlu;
+}
 
 
-
-
-// dispatch tabulka :)
 const funkce = {
   vlozText,
   spocitej,
   smaz,
   del,
   cyklickeTema,
-}
-
-
-
-function vykresliKlavesnici(layoutNazev) {
-  kontejner.innerHTML = "";
-  const layout = layouty[layoutNazev];
-  kontejner.style.gridTemplateColumns = `repeat(${layout.columns}, 1fr)`;
-
-  layout.keys.forEach((def) => {
-    const btn = document.createElement("button");
-    btn.innerHTML = `<span class="key-main">${def.name}</span>`;
-    btn.innerHTML += def.name1 ? `<span class="key-alt">${def.name1}</span>` : "";
-    btn.classList.add("key-button", def.cssClass);
-    btn.style.gridRow = `span ${def.rowSpan ?? 1}`;
-    btn.style.gridColumn = `span ${def.colSpan ?? 1}`;
-    if (def.colSpan > 1) btn.classList.add("wide");
-    btn.def = def;
-
-    // btn.addEventListener("pointerleave", () => {
-    //   clearTimeout(btn.holdTimeout);
-    //   btn.classList.remove("show-alt");
-    // });
-
-    // btn.addEventListener("pointercancel", () => {
-    //   clearTimeout(btn.holdTimeout);
-    //   btn.classList.remove("show-alt");
-    // });
-
-    kontejner.appendChild(btn);
-  });
+  nastaveni,
 };
 
-
-function zpracujTap(target) {
-  const btn = target.closest("button");
-  const def = btn?.def;
-  if (!def) return;
-  if (!tapAktivni) return;
-  const f = funkce[def.fn];
-  if (typeof f === "function") f(def);
-}
-
-function zpracujPodrzeni(target) {
-  const btn = target.closest("button");
-  const def = btn?.def;
-  if (!def) return;
-  const f = funkce[def.fn1 ? def.fn1 : def.fn];
-  alt = def.name1 ? true : false;
-  if (typeof f === "function") f(def);
-}
-
-
-kontejner.addEventListener("pointermove", (e) => {
-  if (!ctrlPressed) return;
-
-  if (!isSimulatedDown) {
-    emitSimulatedEvent("pointerdown", e);
-    isSimulatedDown = true;
-  }
-
-  clearTimeout(stopTimeout);
-  stopTimeout = setTimeout(() => {
-    if (isSimulatedDown) {
-      emitSimulatedEvent("pointerup", e);
-      isSimulatedDown = false;
-    }
-  }, 200);
+initEventHandlers({
+  container: kontejner,
+  dispatchTable: funkce,
+  zmenLayout,
 });
 
-function emitSimulatedEvent(type, original) {
-  const simulated = new PointerEvent(type, {
-    bubbles: true,
-    ctrlKey: true,
-    clientX: original.clientX,
-    clientY: original.clientY,
-    pointerId: original.pointerId,
-    pointerType: original.pointerType,
-    buttons: original.buttons,
-  });
-
-  original.target.dispatchEvent(simulated);
-}
-
-
-// #######################################
-// fce swipe
-// –––––––––––––––––––––––––––––––––––––––
-
-kontejner.addEventListener("pointerdown", e => {
-  startX = e.clientX;
-  startY = e.clientY;
-  tapAktivni = true;
-  aktivniBtn = e.target.closest("button");
-  holdTimeout = setTimeout(() => {
-    tapAktivni = false;
-    aktivniBtn.classList.add("show-alt");
-    zpracujPodrzeni(aktivniBtn);
-  }, 400);
-},
-  { passive: false }
-);
-
-["pointerup", "pointercancel", "pointerleave"].forEach((typ) => {
-  kontejner.addEventListener(typ, (e) => {
-    clearTimeout(holdTimeout);
-    aktivniBtn?.classList.remove("show-alt");
-
-    const endX = e.clientX;
-    const endY = e.clientY;
-    const deltaX = endX - startX;
-    const deltaY = endY - startY;
-
-    if (typ === "pointerup" && (Math.abs(Math.hypot(deltaX, deltaY)) < treshold) && !ctrlPressed) {
-      zpracujTap(aktivniBtn);
-      return;
-    }
-
-    if (typ === "pointerup") {
-      if (Math.abs(deltaX) > Math.abs(deltaY)) {
-    // console.log(deltaX < 0 ? "vlevo" : "vpravo");
-        zmenLayout(deltaX < 0 ? -1 : 1);
-      } else {
-    //   console.log(deltaY < 0 ? "nahoru" : "dolu");
-        deltaY < 0 ? spocitej() : vlozText({ name: '+' });
-      }
-    }
-  }, { passive: false });
-});
-
-
-// kontejner.addEventListener("pointerup", e => {
-//   clearTimeout(holdTimeout);
-//   const endX = e.clientX;
-//   const endY = e.clientY;
-//   const deltaX = endX - startX;
-//   const deltaY = endY - startY;
-//   aktivniBtn.classList.remove("show-alt");
-
-//   if ((Math.abs(Math.hypot(deltaX, deltaY)) < treshold) && !ctrlPressed) {
-//     zpracujTap(aktivniBtn);
-//     return;
-//   };
-
-//   if (Math.abs(deltaX) > Math.abs(deltaY)) {
-//     // console.log(deltaX < 0 ? "vlevo" : "vpravo");
-//     zmenLayout(deltaX < 0 ? -1 : 1);
-//     return;
-//   } else {
-//     //   console.log(deltaY < 0 ? "nahoru" : "dolu");
-//     deltaY < 0 ? spocitej() : vlozText({ name: '+' });
-//     return;
-//   };
-// },
-//   { passive: false }
-// );
-
-// ======== START =========
-vykresliKlavesnici("default");
-// swipe(kontejner, 50);
-
+// kontejner ? vykresliKlavesnici("default", kontejner) : null;
+initKeyboard(kontejner); // místo přímého vykreslení
+// nastavTrigRezim(state.pamet, state.angle);

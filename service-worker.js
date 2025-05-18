@@ -2,10 +2,16 @@ const CACHE_NAME = 'kalkulacka-v1';
 const URLS_TO_CACHE = [
   '/',
   '/index.html',
+  '/nastaveni.html',
   '/css/styl.css',
-  '/js/logika.js',
+  '/js/events.js',
+  '/js/keyboard.js',
   '/js/layout.js',
+  '/js/logika.js',
   '/js/mathjs.js',
+  '/js/state.js',
+  '/js/settings.js',
+  '/js/theming.js',
   '/manifest.webmanifest',
   '/icons/icon-192.png',
   '/icons/icon-512.png'
