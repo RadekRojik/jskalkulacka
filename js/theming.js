@@ -31,10 +31,10 @@ export function nastavTrigRezim(pamet, rezim) {
   // Dvouargumentová atan2
   pamet.atan2 = (y, x) => math.unit(math.atan2(y, x), 'rad').toNumber(rezim);
 
-  //state.angle = rezim;
 }
 
 
+// Přepínání mezi úhly
 export function mod_uhly(){
   const dalsi = walkTroughArray(rezimyUhlu, state.angle, 1);
   state.angle = dalsi;
@@ -42,4 +42,5 @@ export function mod_uhly(){
 }
 
 
+// Inicializace úhlu
 nastavTrigRezim(state.pamet, state.angle);
