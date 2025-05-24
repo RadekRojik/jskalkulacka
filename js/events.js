@@ -13,12 +13,15 @@ let holdTimeout;
 let stopTimeout;
 let tapAktivni = true;
 let aktivniBtn = null;
-const vstup = document.getElementById('vstup');
 
 export function initEventHandlers({ container, dispatchTable, zmenLayout }) {
   kontejner = container;
   funkce = dispatchTable;
   zmenLayoutRef = zmenLayout;
+  const vstup = document.getElementById('vstup');
+  document.getElementById('swipleft').addEventListener('click', () => { zmenLayoutRef(-1); });
+  document.getElementById('swipright').addEventListener('click', () => { zmenLayoutRef(1); });
+
 
   vstup.addEventListener('pointerleave', () => {
     if (document.activeElement === vstup) {

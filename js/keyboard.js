@@ -1,8 +1,8 @@
 import { layouty } from './layout.js';
-import {state} from './state.js';
+import { state, walkTroughArray } from './state.js';
 
-export const layoutNazvy = Object.keys(layouty);
-export let aktivniIndex = 0;
+const layoutNazvy = Object.keys(layouty);
+let aktivniIndex = 0;
 // const kontejner = document.getElementById("klavesnice");
 let kontejner;
 

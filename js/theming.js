@@ -12,6 +12,7 @@ export function cyklickeTema(){
 document.documentElement.setAttribute("data-theme", state.tema);
 
 
+// Nastavení trigonometrického režimu
 export function nastavTrigRezim(pamet, rezim) {
   const primeFunkce = ['sin', 'cos', 'tan', 'sec', 'csc', 'cot'];
   const inverzniFunkce = ['asin', 'acos', 'atan', 'asec', 'acsc', 'acot'];
@@ -38,9 +39,10 @@ export function nastavTrigRezim(pamet, rezim) {
 export function mod_uhly(){
   const dalsi = walkTroughArray(rezimyUhlu, state.angle, 1);
   state.angle = dalsi;
-  nastavTrigRezim(state.pamet, dalsi);
+  nastavTrigRezim(state.gfunkce, dalsi);
+  return dalsi;
 }
 
 
 // Inicializace úhlu
-nastavTrigRezim(state.pamet, state.angle);
+nastavTrigRezim(state.gfunkce, state.angle);

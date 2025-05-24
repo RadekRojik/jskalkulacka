@@ -38,6 +38,8 @@ body {
   display: flex;
   overflow: hidden;
   flex-direction: column;
+  background: var(--bg-displej);
+  color: var(--text-vystup);
 }
 
 #displej {
@@ -50,6 +52,14 @@ body {
   background: var(--bg-displej);
   padding: 0.5rem;
   gap: 0.5rem;
+}
+
+#statusbar, #swipbox {
+  display: flex;
+}
+
+#statusbar span, #swipbox button {
+  flex: 1;
 }
 
 #vstup,
@@ -65,7 +75,8 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
-#vstup {
+#vstup,
+#statusbar {
   color: var(--text-vstup);
 }
 
@@ -75,6 +86,7 @@ body {
 
 #klavesnice {
   flex-shrink: 0;
+  flex-grow: 4;
   margin-top: auto;
   touch-action: none;
   display: grid;
@@ -89,6 +101,10 @@ body {
   user-select: none;
   -webkit-user-select: none;
   touch-action: none;
+}
+
+.swipi {
+  flex-grow: 1;
 }
 
 .numeric {
@@ -158,7 +174,16 @@ body {
 .key-button.show-alt .key-main {
   opacity: 0;
 }
+
  @media (orientation: portrait) {
+  .swipi {
+    display: none;
+    flex: 0;
+  }
+
+  #klavesnice {
+    width: 100dvw;
+  }
   .key-button {
     aspect-ratio: 1 / 1;
   }

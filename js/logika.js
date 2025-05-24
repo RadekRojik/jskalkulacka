@@ -1,9 +1,10 @@
 /// <reference path="./types.d.ts" />
 
+import { reloadstatus } from './statusbar.js';
 import { initKeyboard, zmenLayout } from './keyboard.js';
 import { cyklickeTema } from './theming.js';
 import { initEventHandlers } from './events.js';
-import { state } from './state.js';
+import { state, walkTroughArray, rezimyUhlu } from './state.js';
 
 
 const math = window.math;
@@ -11,13 +12,18 @@ const math = window.math;
 const vstup = document.getElementById("vstup");
 const kontejner = document.getElementById("klavesnice");
 
+
+// vkládá znaky na displej
 function vlozText(hodnota) {
-  const znamenka = ["+","-","*","/","✕"];
-  const kvlozeni = state.altSymbol ? hodnota?.name1 : hodnota.name;
-  znamenka.forEach((zn) => {
-    if (zn == kvlozeni) state.mazat=false;
-  });
-  state.mazat ? smaz() : (()=>{})();
+  const znamenka = ["+", "-", "*", "/", "✕"];
+  const kvlstr = state.altSymbol ? hodnota?.str1 : hodnota?.str;
+  const kvlnam = state.altSymbol ? hodnota?.name1 : hodnota?.name;
+  const kvlozeni = kvlstr ? kvlstr : kvlnam;
+  // znamenka.forEach((zn) => {
+  //   if (zn == kvlozeni) state.mazat = false;
+  // });
+  if (znamenka.includes(kvlozeni)) state.mazat = false;
+  state.mazat ? smaz() : (() => { })();
   if (vstup.textContent.trim() == "0") {
     vstup.textContent = "";
   }
@@ -26,56 +32,35 @@ function vlozText(hodnota) {
   state.altSymbol = false;
 };
 
-function vypisPamet(scope) {
-  const vysledek = [];
-  for (const [jmeno, hodnota] of Object.entries(scope)) {
-    let typ = typeof hodnota;
-    let zobrazeni;
-    if (typeof hodnota === 'function') {
-      typ = 'funkce';
-      zobrazeni = hodnota.toString();
-    } else if (typeof hodnota === 'object' && hodnota?.isUnit) {
-      typ = 'jednotka';
-      zobrazeni = `${hodnota.toNumber(hodnota.units[0].unit.name)} ${hodnota.units[0].unit.name}`;
-    } else {
-      zobrazeni = String(hodnota);
-    }
-    vysledek.push(`${jmeno}: [${typ}] ${zobrazeni}`);
-  }
-  return vysledek.join('\n');
-}
 
-function smazat(jmeno, scope) {
-  if (jmeno in scope) {
-    delete scope[jmeno];
-    return `Smazáno: ${jmeno}`;
-  } else {
-    return `Proměnná nebo funkce '${jmeno}' neexistuje.`;
-  }
-}
-
-function nastaveni(){
+// wraper na skok do nastavení
+function goToNastaveni() {
   window.location.href = "nastaveni.html";
 }
 
+
+// funkce vyhodnocující výraz
 function spocitej() {
+  const scope = {...state.pamet, ...state.gfunkce};
   try {
     const vyraz = vstup.textContent
       .replace(/\u00A0/g, ' ')
       .replace(/✕/g, '*')
+      // .replace(/√(.*?)\s*[ $]/gim, 'sqrt($1)')
+      .replace(/√\(?([^) \n]+)\)?/g, 'sqrt($1)')
       .trim();
     const node = math.parse(vyraz);
     let vysledek;
     if (node.type === 'BlockNode') {
       const blocks = node.blocks;
       for (let i = 0; i < blocks.length; i++) {
-        const result = blocks[i].node.evaluate(state.pamet);
+        const result = blocks[i].node.evaluate(scope);
         if (i === blocks.length - 1) {
           vysledek = result;
         }
       }
     } else {
-      vysledek = node.evaluate(state.pamet);
+      vysledek = node.evaluate(scope);
       if (node.type === 'AssignmentNode' || node.type === 'FunctionAssignmentNode') {
         vysledek = 0;
       }
@@ -84,6 +69,7 @@ function spocitej() {
       vysledek = math.format(vysledek, { precision: state.DES_MIST });
     }
     vstup.textContent = String(vysledek ?? 0);
+    pridejDoAns(state.ans, vstup.textContent, state.ANS_HISTORY);
     state.mazat = true;
   } catch (err) {
     vstup.textContent = `Chyba: ${err.message}`;
@@ -91,47 +77,33 @@ function spocitej() {
   }
 }
 
+
+// mazání posledního znaku
 function del() {
   vstup.textContent = vstup.textContent.trim() != "0" ? vstup.textContent.slice(0, -1) : "0";
   if (state.mazat) smaz();
 }
 
+
+// Smazání displeje
 function smaz() {
   vstup.textContent = "0";
   state.mazat = false;
 }
 
-
-function nastavTrigRezim(pamet, rezim) {
-  const primeFunkce = ['sin', 'cos', 'tan', 'sec', 'csc', 'cot'];
-  const inverzniFunkce = ['asin', 'acos', 'atan', 'asec', 'acsc', 'acot'];
-
-  const uhel = x => math.unit(x, rezim);
-
-  // Přímé funkce: sin(x) → sin(unit(x, 'deg'))
-  primeFunkce.forEach(jmeno => {
-    pamet[jmeno] = x => math[jmeno](uhel(x));
-  });
-
-  // Inverzní funkce: asin(x) → unit(asin(x), 'deg').value
-  inverzniFunkce.forEach(jmeno => {
-    pamet[jmeno] = x => math.unit(math[jmeno](x), rezim).value;
-  });
-
-  // Dvouargumentová atan2
-  pamet.atan2 = (y, x) => math.unit(math.atan2(y, x), rezim).value;
+function vratAns(){
+  const tohle = {};
+  tohle.name1 = state.ans[0];
+  // console.log(state.ans);
+  vlozText(tohle);
 }
 
-const mozneRezimy = ['rad', 'deg', 'grad'];
-let aktualniIndexUhlu = 0;
-let aktualniRezimUhlu = mozneRezimy[aktualniIndexUhlu];
-
-function mod_uhly() {
-  // posuň index cyklicky
-  aktualniIndexUhlu = (aktualniIndexUhlu + 1) % mozneRezimy.length;
-  aktualniRezimUhlu = mozneRezimy[aktualniIndexUhlu];
-  nastavTrigRezim(pamet, aktualniRezimUhlu);
-  return aktualniRezimUhlu;
+function pridejDoAns(pole, prvek, maxDelka) {
+  pole.unshift(prvek);
+  // console.log('přidávám ', prvek);
+  while (pole.length > maxDelka) {
+    pole.pop();
+  }
 }
 
 
@@ -141,7 +113,8 @@ const funkce = {
   smaz,
   del,
   cyklickeTema,
-  nastaveni,
+  goToNastaveni,
+  vratAns,
 };
 
 initEventHandlers({
@@ -153,3 +126,4 @@ initEventHandlers({
 // kontejner ? vykresliKlavesnici("default", kontejner) : null;
 initKeyboard(kontejner); // místo přímého vykreslení
 // nastavTrigRezim(state.pamet, state.angle);
+reloadstatus();
