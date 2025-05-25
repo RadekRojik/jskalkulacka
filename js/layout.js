@@ -12,7 +12,7 @@ export const layouty = {
       { name: "5", name1: "cos", str1: "cos(", fn: "vlozText", cssClass: "numeric" },
       { name: "6", name1: "tan", str1: "tan(", fn: "vlozText", cssClass: "numeric" },
       { name: "✕", name1: "xʸ", str1: "^", fn: "vlozText", cssClass: "function" },
-      { name: "1", name1: "√x", name1: "√", fn: "vlozText", cssClass: "numeric" },
+      { name: "1", name1: "√x", str1: "√(", fn: "vlozText", cssClass: "numeric" },
       { name: "2", fn: "vlozText", cssClass: "numeric" },
       { name: "3", fn: "vlozText", cssClass: "numeric" },
       { name: "-", fn: "vlozText", cssClass: "function" },
