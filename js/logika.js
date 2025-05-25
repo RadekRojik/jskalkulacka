@@ -8,6 +8,9 @@ import { state, walkTroughArray, rezimyUhlu } from './state.js';
 
 
 const math = window.math;
+
+//math['√'] = math.sqrt;
+
 // const state.pamet = {}; // globální scope
 const vstup = document.getElementById("vstup");
 const kontejner = document.getElementById("klavesnice");
@@ -28,6 +31,7 @@ function vlozText(hodnota) {
     vstup.textContent = "";
   }
   vstup.textContent += kvlozeni;
+  vstup.textContent = vstup.textContent.replace(/([+\*/^])\1+/g, '$1');
   vstup.scrollLeft = vstup.scrollWidth;
   state.altSymbol = false;
 };
@@ -46,8 +50,10 @@ function spocitej() {
     const vyraz = vstup.textContent
       .replace(/\u00A0/g, ' ')
       .replace(/✕/g, '*')
+      // .replace(/([+\*/^])\1+/g, '$1')
+      .replace(/√/g, 'sqrt')
       // .replace(/√(.*?)\s*[ $]/gim, 'sqrt($1)')
-      .replace(/√\(?([^) \n]+)\)?/g, 'sqrt($1)')
+      //.replace(/√\(?([^) \n]+)\)?/g, 'sqrt($1)')
       .trim();
     const node = math.parse(vyraz);
     let vysledek;
