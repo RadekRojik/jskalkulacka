@@ -31,7 +31,7 @@ function vlozText(hodnota) {
     vstup.textContent = "";
   }
   vstup.textContent += kvlozeni;
-  vstup.textContent = vstup.textContent.replace(/([+\*/^])\1+/g, '$1');
+  vstup.textContent = vstup.textContent.replace(/([✕+\*/^])\1+/g, '$1');
   vstup.scrollLeft = vstup.scrollWidth;
   state.altSymbol = false;
 };
