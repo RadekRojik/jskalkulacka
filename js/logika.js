@@ -78,7 +78,7 @@ function spocitej() {
     if (vstup.textContent != 0) pridejDoAns(state.ans, vstup.textContent, state.ANS_HISTORY);
     state.mazat = true;
   } catch (err) {
-    vstup.textContent = `Chyba: ${err.message}`;
+    vstup.textContent = `ERR: ${err.message}`;
     state.mazat = true;
   }
 }
