@@ -1,65 +1,64 @@
-import { state } from "./state.js";
+import { state, saveToLocal } from "./state.js";
 import { cyklickeTema, mod_uhly } from "./theming.js";
 import { reloadstatus } from "./statusbar.js";
 
+const math = window.math;
+
 // Skok na index.html
-function goToIndex(){
-    window.location.href = "index.html";
+function goToIndex() {
+  window.location.href = "index.html";
 }
 
+// Smazání vzorce z `state.vzorce`
+function smazVzorec(index) {
+  const expr = state.vzorce[index];
+  if (!expr) return;
 
-// výpis paměti
-function vypisPamet(scope) {
-  const vysledek = [];
-  for (const [jmeno, hodnota] of Object.entries(scope)) {
-    let typ = typeof hodnota;
-    let zobrazeni;
-    if (typeof hodnota === 'function') {
-      typ = 'funkce';
-      zobrazeni = hodnota.toString();
-    } else if (typeof hodnota === 'object' && hodnota?.isUnit) {
-      typ = 'jednotka';
-      zobrazeni = `${hodnota.toNumber(hodnota.units[0].unit.name)} ${hodnota.units[0].unit.name}`;
-    } else {
-      zobrazeni = String(hodnota);
+  // Odeber ze vzorců
+  state.vzorce.splice(index, 1);
+  saveToLocal('vzorce');
+
+  // Odeber z runtime pameti (pamet)
+  try {
+    const node = math.parse(expr);
+    if (node.type === 'AssignmentNode' || node.type === 'FunctionAssignmentNode') {
+      const name = node.name;
+      delete state.pamet[name];  // Už není pamet.default, ale přímo pamet
     }
-    vysledek.push(`${jmeno}: [${typ}] ${zobrazeni}`);
+  } catch (e) {
+    console.warn('Chyba při odstraňování vzorce z pameti:', e.message);
   }
-  return vysledek.join('\n');
+
+  vypisVzorce();
 }
 
+// Výpis všech vzorců
+function vypisVzorce() {
+  let html = "<h3>Formulas and variables</h3>";
 
-// mazání výrazu z paměti
-function smazat(jmeno, scope) {
-  if (jmeno in scope) {
-    delete scope[jmeno];
-    return `Smazáno: ${jmeno}`;
-  } else {
-    return `Proměnná nebo funkce '${jmeno}' neexistuje.`;
-  }
+  state.vzorce.forEach((expr, index) => {
+    html += `<div>${expr} <button onclick="smazVzorec(${index})">Delete</button></div>`;
+  });
+
+  document.getElementById('pamet').innerHTML = html;
 }
 
-
-function ukapamet (e) {
-    e.target.nextElementSibling.textContent = vypisPamet(state.pamet);
-    // console.log(state);
-}
-
-
-// dispatch tabulka na tlacitka
+// Tlačítka
 const tabulka = {
-    btnTema: cyklickeTema,
-    uhly: () => {mod_uhly(); reloadstatus();},
-    ukapamet: ukapamet,
-    zpet: goToIndex,
+  btnTema: cyklickeTema,
+  uhly: () => { mod_uhly(); reloadstatus(); },
+  ukapamet: vypisVzorce,
+  zpet: goToIndex,
 }
 
 function dispatch(event, table) {
-    if (Object.keys(table).includes(event.target.id)){
-        table[event.target.id](event);
-    }
+  if (Object.keys(table).includes(event.target.id)) {
+    table[event.target.id](event);
+  }
 }
 
-document.addEventListener('click', e => {dispatch(e, tabulka);});
+document.addEventListener('click', e => { dispatch(e, tabulka); });
 
 reloadstatus();
+window.smazVzorec = smazVzorec;
+vypisVzorce();

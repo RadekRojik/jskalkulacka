@@ -45,15 +45,13 @@ function goToNastaveni() {
 
 // funkce vyhodnocující výraz
 function spocitej() {
-  const scope = {...state.pamet, ...state.gfunkce};
+//   const scope = {...state.pamet.default, ...state.gfunkce};
+  const scope = state.pamet;
   try {
     const vyraz = vstup.textContent
       .replace(/\u00A0/g, ' ')
       .replace(/✕/g, '*')
-      // .replace(/([+\*/^])\1+/g, '$1')
       .replace(/√/g, 'sqrt')
-      // .replace(/√(.*?)\s*[ $]/gim, 'sqrt($1)')
-      //.replace(/√\(?([^) \n]+)\)?/g, 'sqrt($1)')
       .trim();
     const node = math.parse(vyraz);
     let vysledek;
@@ -68,6 +66,8 @@ function spocitej() {
     } else {
       vysledek = node.evaluate(scope);
       if (node.type === 'AssignmentNode' || node.type === 'FunctionAssignmentNode') {
+        pridejDoAns(state.vzorce, vyraz,100);
+        // console.log('typ: ', node.type);
         vysledek = 0;
       }
     }
@@ -75,7 +75,7 @@ function spocitej() {
       vysledek = math.format(vysledek, { precision: state.DES_MIST });
     }
     vstup.textContent = String(vysledek ?? 0);
-    pridejDoAns(state.ans, vstup.textContent, state.ANS_HISTORY);
+    if (vstup.textContent != 0) pridejDoAns(state.ans, vstup.textContent, state.ANS_HISTORY);
     state.mazat = true;
   } catch (err) {
     vstup.textContent = `Chyba: ${err.message}`;

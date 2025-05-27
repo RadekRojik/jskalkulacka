@@ -39,10 +39,10 @@ export function nastavTrigRezim(pamet, rezim) {
 export function mod_uhly(){
   const dalsi = walkTroughArray(rezimyUhlu, state.angle, 1);
   state.angle = dalsi;
-  nastavTrigRezim(state.gfunkce, dalsi);
+  nastavTrigRezim(state.pamet, dalsi);
   return dalsi;
 }
 
 
 // Inicializace úhlu
-nastavTrigRezim(state.gfunkce, state.angle);
+nastavTrigRezim(state.pamet, state.angle);

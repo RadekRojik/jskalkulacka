@@ -6,5 +6,5 @@ const uhly = document?.getElementById("uhly");
 
 export function reloadstatus (){
     if (uhly) uhly.innerText = 'Mod: ' + state.angle;
-    if (scope) scope.innerText = 'Scope: ' + Object.keys(state.pamet);
+    // if (scope) scope.innerText = 'Scope: ' + Object.keys(state.pamet);
 }

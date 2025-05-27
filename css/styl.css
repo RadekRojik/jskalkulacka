@@ -42,6 +42,14 @@ body {
   color: var(--text-vystup);
 }
 
+hr {
+  width: 100%;
+  height: 2px; /* tloušťka čáry */
+  background-color: var(--text-vystup);
+  border: none;
+  margin: 1rem 0;
+}
+
 #displej {
   /*height: 30%;*/
   flex: 1 1 auto;
