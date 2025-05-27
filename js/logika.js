@@ -70,6 +70,10 @@ function spocitej() {
         // console.log('typ: ', node.type);
         vysledek = 0;
       }
+      if (typeof vysledek.toString === 'function') {
+      vysledek = math.format(vysledek, { precision: state.DES_MIST });
+      vysledek = math.evaluate(vysledek, scope);
+    }
     }
     if (vysledek && typeof vysledek.toString === 'function') {
       vysledek = math.format(vysledek, { precision: state.DES_MIST });
