@@ -2,7 +2,7 @@ import { reloadstatus } from './statusbar.js';
 import { initKeyboard, zmenLayout } from './keyboard.js';
 import { cyklickeTema } from './theming.js';
 import { initEventHandlers } from './events.js';
-import { state, walkTroughArray, rezimyUhlu } from './state.js';
+import { state, walkTroughArray, rezimyUhlu, walkTroughObject, loadState, watchprops } from './state.js';
 import { makeResult } from './makeresult.js';
 
 //math['√'] = math.sqrt;
@@ -55,6 +55,10 @@ export function vratAns(){
   insertText(tohle);
 }
 
+export function zmenScope(){
+  state['activeUserScope'] = walkTroughObject(state.user, state.activeUserScope, 1);
+  loadState(state, watchprops);
+}
 
 
 const funkce = {
@@ -65,6 +69,7 @@ const funkce = {
   cyklickeTema,
   goToNastaveni,
   vratAns,
+  zmenScope,
 };
 
 initEventHandlers({

@@ -1,10 +1,12 @@
 import { reloadstatus } from "./statusbar.js";
 
-const innerState = {
+export const innerState = {
   tema: 'light',
   keyboardlayout: 'default',
   treshold: 50,
   timehold: 400,
+  mem: 100,
+  outFormat:{fraction: 'ratio'},
   altSymbol: false,
   DES_MIST: 4,
   mazat: false,
@@ -29,7 +31,7 @@ export const watchprops = ['activeUserScope', 'ans', 'ANS_HISTORY',
 
 export function saveToLocal(key) {
   const val = innerState[key];
-  console.log(val);
+  // console.log(val);
   localStorage.setItem(key, serialize(val));
 }
 
@@ -103,7 +105,7 @@ export function loadState(obj, keys) {
     const val = localStorage.getItem(k);
     if (val !== null && val !== 'undefined') {
       try {
-        obj[k] = deserialize(val);  // Použij přímo deserialize()
+        obj[k] = deserialize(val);
         // math.import(obj[k]);
         if (k === 'vzorce' && Array.isArray(obj[k])) {
           obj[k].forEach(expr => {
@@ -141,7 +143,7 @@ export const state = new Proxy(innerState, {
         localStorage.setItem(prop, JSON.stringify(value));
       }
     }
-    if (['angle'].includes(prop)) {
+    if (['angle', 'activeUserScope'].includes(prop)) {
       reloadstatus();
     }
     obj[prop] = value;
@@ -158,6 +160,12 @@ export function walkTroughArray(array, item, step) {
   return array[(pozice + step) % array.length];
 }
 
+export function walkTroughObject(obj, item, step) {
+  const klice = Object.keys(obj);
+  const aktualni = klice.indexOf(item);
+  const a = (aktualni + step + klice.length)%klice.length;
+  return klice[a];
+}
 
 /* testovací objekt
 elektrika: {

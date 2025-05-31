@@ -22,35 +22,37 @@ export function makeResult() {
  
     switch (node.type) {
       case 'SymbolNode':
-        vysledek = node.evaluate(scope);
-        vysledek = math.format(vysledek, { fraction: 'ratio' });
-        vysledek = math.evaluate(vysledek, scope);
         if (typeof activeScope[node.name] === 'string') {
           vysledek = math.evaluate(activeScope[node.name], scope);
-          vysledek = math.format(vysledek, { fraction: 'ratio' });
-          vysledek = math.evaluate(vysledek, scope);
-          }
+        } else {
+          vysledek = node.evaluate(scope);
+          // vysledek = math.format(vysledek, state.outFormat);
+          // vysledek = math.evaluate(vysledek, scope);
+        }
+        vysledek = math.format(vysledek, state.outFormat);
+        vysledek = math.evaluate(vysledek, scope);
+        
         break;
       case 'AssignmentNode':
-        testAns(node.toString(), state.vzorce, 100);
+        testAns(node.toString(), state.vzorce, state.mem);
         vysledek = node.evaluate(scope);
-        if (vysledek && typeof vysledek.toString === 'function') {
-          vysledek = math.format(vysledek, { fraction: 'ratio' });
+        // if (vysledek && typeof vysledek.toString === 'function') {
+          vysledek = math.format(vysledek, state.outFormat);
           math.evaluate(vysledek, scope);
-          }
+          // }
         vysledek = 0;
         break;
       case 'FunctionAssignmentNode':
-        testAns(node.toString(), state.vzorce, 100);
-        vysledek =  math.evaluate(vyraz, scope);
-        vysledek = math.format(vysledek, { fraction: 'ratio' });
+        testAns(node.toString(), state.vzorce, state.mem);
+        vysledek = math.evaluate(vyraz, scope);
+        vysledek = math.format(vysledek, state.outFormat);
         vysledek = 0;
         break;
       case 'FunctionNode':
         vysledek =  node.toString();
         if (activeScope[node.name]) {
           math.evaluate(activeScope[node.name], scope);
-          vysledek = math.format(vysledek, { fraction: 'ratio' });
+          vysledek = math.format(vysledek, state.outFormat);
           vysledek = math.evaluate(vysledek, scope);
           }
         vysledek = math.evaluate(vysledek, scope);
@@ -60,7 +62,7 @@ export function makeResult() {
         for (let i = 0; i < blocks.length; i++) {
           const result = blocks[i].node.evaluate(scope);
           if (i === blocks.length - 1) {
-            vysledek = math.format(result, {fraction: 'ratio'});
+            vysledek = math.format(result, state.outFormat);
           }
         }
         break;

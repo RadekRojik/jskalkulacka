@@ -19,7 +19,7 @@ export const layouty = {
       { name: "0", fn: "insertText", cssClass: "numeric" },
       { name: ".", fn: "insertText", cssClass: "numeric" },
       { name: "+", fn: "insertText", cssClass: "function" },
-      { name: "S", fn: "goToNastaveni", cssClass: "other" },
+      { name: "Sc", name1: "Set", fn: "zmenScope", fn1: "goToNastaveni", cssClass: "other" },
       { name: "←", fn: "del", fn1: "smaz", cssClass: "other" },
       { name: "=", name1: "Ans", fn: "makeResult", fn1: "vratAns", cssClass: "function", colSpan:3},
     ],
