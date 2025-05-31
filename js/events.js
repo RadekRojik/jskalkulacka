@@ -33,13 +33,13 @@ export function initEventHandlers({ container, dispatchTable, zmenLayout }) {
   document.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      funkce.spocitej();
+      funkce.makeResult();
     }
     if (e.key === "Control") ctrlPressed = true;
     if (document.activeElement === vstup) return;
     if (e.key.length === 1) {
       const kuk = { name: e.key };
-      funkce.vlozText(kuk);
+      funkce.insertText(kuk);
     }
   });
 
@@ -49,8 +49,8 @@ export function initEventHandlers({ container, dispatchTable, zmenLayout }) {
     if (e.key === "Backspace") funkce.del();
     if (e.key === "Delete") funkce.del();
     if (e.key === "Escape") funkce.smaz();
-    if (e.key === "ArrowLeft") zmenLayoutRef(-1);
-    if (e.key === "ArrowRight") zmenLayoutRef(1);
+    if (e.key === "ArrowLeft" && e.ctrlKey ) zmenLayoutRef(-1);
+    if (e.key === "ArrowRight" && e.ctrlKey ) zmenLayoutRef(1);
   });
 
   // pohyb
@@ -102,7 +102,7 @@ export function initEventHandlers({ container, dispatchTable, zmenLayout }) {
         if (Math.abs(deltaX) > Math.abs(deltaY)) {
           zmenLayoutRef(deltaX < 0 ? -1 : 1);
         } else {
-          deltaY < 0 ? funkce.spocitej() : funkce.vlozText({ name: '+' });
+          deltaY < 0 ? funkce.makeResult() : funkce.insertText({ name: '+' });
         }
       }
     }, { passive: false });

@@ -10,21 +10,54 @@ const innerState = {
   mazat: false,
   angle: 'deg',
   ANS_HISTORY: 10,
+  activeUserScope: 'basic',
   ans: [],
-  pamet: {},       // runtime scope, neukládá se
+  pamet: {},
   vzorce: [],
-  user: {},
+  user: {
+    basic: {}
+  }
 };
 
 export const temata = ["light", "dark", "ocean"];
 export const rezimyUhlu = ['rad', 'deg', 'grad'];
 
-const watchprops = ['ans', 'ANS_HISTORY', 'DES_MIST', 'tema', 'angle', 'treshold', 'timehold', 'keyboardlayout', 'vzorce'];
+export const watchprops = ['activeUserScope', 'ans', 'ANS_HISTORY',
+  'DES_MIST', 'tema', 'angle', 'treshold', 'timehold',
+  'keyboardlayout', 'vzorce', 'user'];
+
 
 export function saveToLocal(key) {
   const val = innerState[key];
-  localStorage.setItem(key, JSON.stringify(val));
+  console.log(val);
+  localStorage.setItem(key, serialize(val));
 }
+
+
+export function serialize(obj) {
+  return JSON.stringify(obj, (key, value) => {
+    if (typeof value === 'function') {
+      return { __isFunction__: true, source: value.toString() };
+    }
+    return value;
+  }, 2); // pěkně formátovaný JSON
+}
+
+export function deserialize(json) {
+  return JSON.parse(json, (key, value) => {
+    if (value && value.__isFunction__ && value.source) {
+      try {
+        console.log(key, " *** ",value.source);
+        return eval('(' + value.source + ')');
+      } catch (e) {
+        console.warn('Chyba při obnově funkce:', e.message);
+        return undefined;
+      }
+    }
+    return value;
+  });
+}
+
 
 function deepProxy(obj, key, saveFn) {
   if (typeof obj !== 'object' || obj === null) return obj;
@@ -64,12 +97,14 @@ function deepProxy(obj, key, saveFn) {
   return new Proxy(obj, handler);
 }
 
-function loadState(obj, keys) {
+
+export function loadState(obj, keys) {
   keys.forEach(k => {
     const val = localStorage.getItem(k);
     if (val !== null && val !== 'undefined') {
       try {
-        obj[k] = JSON.parse(val);
+        obj[k] = deserialize(val);  // Použij přímo deserialize()
+        // math.import(obj[k]);
         if (k === 'vzorce' && Array.isArray(obj[k])) {
           obj[k].forEach(expr => {
             try {
@@ -79,12 +114,14 @@ function loadState(obj, keys) {
             }
           });
         }
+
       } catch {
         obj[k] = isNaN(val) ? val : Number(val);
       }
     }
   });
 }
+
 
 loadState(innerState, watchprops);
 
@@ -120,3 +157,14 @@ export function walkTroughArray(array, item, step) {
   const pozice = index !== -1 ? index : 0;
   return array[(pozice + step) % array.length];
 }
+
+
+/* testovací objekt
+elektrika: {
+   proud: 10,
+   napeti: 230,
+   vykon: 'vykon(proud, napeti) = proud*napeti'
+}
+*/
+window.scop = innerState;
+window.des = deserialize;
