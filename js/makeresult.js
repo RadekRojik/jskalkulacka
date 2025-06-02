@@ -26,8 +26,6 @@ export function makeResult() {
           vysledek = math.evaluate(activeScope[node.name], scope);
         } else {
           vysledek = node.evaluate(scope);
-          // vysledek = math.format(vysledek, state.outFormat);
-          // vysledek = math.evaluate(vysledek, scope);
         }
         vysledek = math.format(vysledek, state.outFormat);
         vysledek = math.evaluate(vysledek, scope);
@@ -36,10 +34,8 @@ export function makeResult() {
       case 'AssignmentNode':
         testAns(node.toString(), state.vzorce, state.mem);
         vysledek = node.evaluate(scope);
-        // if (vysledek && typeof vysledek.toString === 'function') {
-          vysledek = math.format(vysledek, state.outFormat);
-          math.evaluate(vysledek, scope);
-          // }
+        vysledek = math.format(vysledek, state.outFormat);
+        math.evaluate(vysledek, scope);
         vysledek = 0;
         break;
       case 'FunctionAssignmentNode':
@@ -54,7 +50,7 @@ export function makeResult() {
           math.evaluate(activeScope[node.name], scope);
           vysledek = math.format(vysledek, state.outFormat);
           vysledek = math.evaluate(vysledek, scope);
-          }
+        }
         vysledek = math.evaluate(vysledek, scope);
         break;
       case 'BlockNode':
@@ -71,7 +67,7 @@ export function makeResult() {
     vstup.textContent = String(vysledek ?? 0);
     if (vstup.textContent != 0) pridejDoAns(state.ans, vstup.textContent, state.ANS_HISTORY);
     state.mazat = true;
-    loadState(state, watchprops);
+    //loadState(state, watchprops);
   } catch (err) {
     vstup.textContent = `ERR: ${err.message}`;
     state.mazat = true;
@@ -87,16 +83,13 @@ function pridejDoAns(pole, prvek, maxDelka) {
   }
 }
 
-
-// Funkce na zpracování zásobníku
 function testAns(str, pole, maxDelka) {
-  // Najde klíčové slovo (od začátku stringu, obsahující a-z, 0-9)
+  // console.log('Jsem v testAns ', str);
   const match = str.match(/^[a-z\d]+/i);
-  if (!match) return pole; // Pokud není klíčové slovo, nic se nemění
+  if (!match) return pole;
 
   const klic = match[0];
 
-  // Projdi pole a případně nahraď prvek, pokud začíná na klíčové slovo
   for (let i = 0; i < pole.length; i++) {
     const poleMatch = pole[i].match(/^[a-z\d]+/i);
     if (poleMatch && poleMatch[0] === klic) {
@@ -107,5 +100,11 @@ function testAns(str, pole, maxDelka) {
 
   pridejDoAns(pole, str, maxDelka);
 
+  try {
+     math.evaluate(str, state.pamet); // <<< přidej evaluaci sem
+   } catch (e) {
+     console.warn(`Nepodařilo se vyhodnotit výraz "${expr}":`, e.message);
+    }
   return pole;
 }
+

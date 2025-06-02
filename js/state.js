@@ -30,8 +30,8 @@ export const watchprops = ['activeUserScope', 'ans', 'ANS_HISTORY',
 
 
 export function saveToLocal(key) {
-  const val = innerState[key];
-  // console.log(val);
+  const val = state[key];
+  // console.log('ukládám: ', val);
   localStorage.setItem(key, serialize(val));
 }
 
@@ -49,7 +49,7 @@ export function deserialize(json) {
   return JSON.parse(json, (key, value) => {
     if (value && value.__isFunction__ && value.source) {
       try {
-        console.log(key, " *** ",value.source);
+        // console.log(key, " *** ",value.source);
         return eval('(' + value.source + ')');
       } catch (e) {
         console.warn('Chyba při obnově funkce:', e.message);
@@ -58,45 +58,6 @@ export function deserialize(json) {
     }
     return value;
   });
-}
-
-
-function deepProxy(obj, key, saveFn) {
-  if (typeof obj !== 'object' || obj === null) return obj;
-
-  const handler = {
-    get(target, prop) {
-      const value = target[prop];
-      return typeof value === 'object' && value !== null
-        ? deepProxy(value, key, saveFn)
-        : value;
-    },
-    set(target, prop, value) {
-      target[prop] = deepProxy(value, key, saveFn);
-      saveFn(key);
-      return true;
-    }
-  };
-
-  if (Array.isArray(obj)) {
-    ['push', 'pop', 'shift', 'unshift', 'splice'].forEach(fn => {
-      handler.get = (target, prop) => {
-        if (fn === prop) {
-          return (...args) => {
-            const result = Array.prototype[fn].apply(target, args);
-            saveFn(key);
-            return result;
-          };
-        }
-        const value = target[prop];
-        return typeof value === 'object' && value !== null
-          ? deepProxy(value, key, saveFn)
-          : value;
-      };
-    });
-  }
-
-  return new Proxy(obj, handler);
 }
 
 
@@ -127,32 +88,8 @@ export function loadState(obj, keys) {
 
 loadState(innerState, watchprops);
 
-for (const k of watchprops) {
-  if (typeof innerState[k] === 'object' && innerState[k] !== null) {
-    innerState[k] = deepProxy(innerState[k], k, saveToLocal);
-  }
-}
 
-export const state = new Proxy(innerState, {
-  set(obj, prop, value) {
-    if (watchprops.includes(prop)) {
-      if (typeof value === 'object' && value !== null) {
-        value = deepProxy(value, prop, saveToLocal);
-        saveToLocal(prop);
-      } else {
-        localStorage.setItem(prop, JSON.stringify(value));
-      }
-    }
-    if (['angle', 'activeUserScope'].includes(prop)) {
-      reloadstatus();
-    }
-    obj[prop] = value;
-    return true;
-  },
-  get(obj, prop) {
-    return obj[prop];
-  }
-});
+export const state = createDeepProxy(innerState, saveToLocal);
 
 export function walkTroughArray(array, item, step) {
   const index = array.indexOf(item);
@@ -176,3 +113,42 @@ elektrika: {
 */
 window.scop = innerState;
 window.des = deserialize;
+
+function createDeepProxy(obj, callback, rootKey = null) {
+  return new Proxy(obj, {
+    get(target, prop, receiver) {
+      const value = Reflect.get(target, prop, receiver);
+
+      // Pro metody polí (push, pop, splice atd.)
+      if (typeof value === 'function' && Array.isArray(target)) {
+        return function(...args) {
+          const result = Reflect.apply(value, target, args);
+          if (rootKey && watchprops.includes(rootKey)) {
+            callback(rootKey); // zavoláme callback pro správný klíč
+          }
+          return result;
+        };
+      }
+
+      // Pro objekty zanoříme dál a zachováme rootKey
+      if (typeof value === 'object' && value !== null) {
+        return createDeepProxy(value, callback, rootKey || prop);
+      }
+
+      return value;
+    },
+    set(target, prop, value) {
+      const result = Reflect.set(target, prop, value);
+      const key = rootKey || prop;
+      if (watchprops.includes(key)) callback(key);
+      if (['angle', 'activeUserScope'].includes(prop)) reloadstatus();
+      return result;
+    },
+    deleteProperty(target, prop) {
+      const result = Reflect.deleteProperty(target, prop);
+      const key = rootKey || prop;
+      if (watchprops.includes(key)) callback(key);
+      return result;
+    }
+  });
+}

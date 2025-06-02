@@ -57,7 +57,7 @@ export function vratAns(){
 
 export function zmenScope(){
   state['activeUserScope'] = walkTroughObject(state.user, state.activeUserScope, 1);
-  loadState(state, watchprops);
+  //loadState(state, watchprops);
 }
 
 

@@ -6,5 +6,5 @@ export function reloadstatus (){
   const uhly = document?.getElementById("uhly");
   // console.log('přepisuju statusbar');
   if (uhly) uhly.innerText = 'Mod: ' + state.angle;
-  if (scope) scope.innerText = 'Scope: ' + state['activeUserScope'];
+  if (scope) scope.innerText = 'Scope: ' + state.activeUserScope;
 }
