@@ -44,18 +44,18 @@ function vypisVzorce() {
 // Tlačítka
 const tabulka = {
   btnTema: cyklickeTema,
-  uhly: () => { mod_uhly(); reloadstatus(); },
+  uhly: () => { mod_uhly();},
   ukapamet: vypisVzorce,
   zpet: goToIndex,
   importBtn: () => { const text = document.getElementById('userJson').value;
     if (importUserScope(text)) {
       alert('Import proběhl.');
     }},
-  exportBtn: () => {() => {
+  exportBtn: () => {
   const scopeName = document.getElementById('scopeName').value.trim();
-  const json = exportUserScope(scope);
+  const json = exportUserScope(scopeName);
   document.getElementById('userJson').value = json || '';
-}},
+},
 }
 
 function dispatch(event, table) {

@@ -31,33 +31,16 @@ export const watchprops = ['activeUserScope', 'ans', 'ANS_HISTORY',
 
 export function saveToLocal(key) {
   const val = state[key];
-  // console.log('ukládám: ', val);
   localStorage.setItem(key, serialize(val));
 }
 
 
 export function serialize(obj) {
-  return JSON.stringify(obj, (key, value) => {
-    if (typeof value === 'function') {
-      return { __isFunction__: true, source: value.toString() };
-    }
-    return value;
-  }, 2); // pěkně formátovaný JSON
-}
+  return JSON.stringify(obj, null, 2);
+ }
 
 export function deserialize(json) {
-  return JSON.parse(json, (key, value) => {
-    if (value && value.__isFunction__ && value.source) {
-      try {
-        // console.log(key, " *** ",value.source);
-        return eval('(' + value.source + ')');
-      } catch (e) {
-        console.warn('Chyba při obnově funkce:', e.message);
-        return undefined;
-      }
-    }
-    return value;
-  });
+  return JSON.parse(json);
 }
 
 
@@ -111,8 +94,6 @@ elektrika: {
    vykon: 'vykon(proud, napeti) = proud*napeti'
 }
 */
-window.scop = innerState;
-window.des = deserialize;
 
 function createDeepProxy(obj, callback, rootKey = null) {
   return new Proxy(obj, {
@@ -152,3 +133,6 @@ function createDeepProxy(obj, callback, rootKey = null) {
     }
   });
 }
+
+window.scop = innerState;
+window.des = deserialize;

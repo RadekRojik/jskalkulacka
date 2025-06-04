@@ -1,44 +1,32 @@
 import { state, serialize, deserialize } from "./state.js";
 
+
+const JSON5 = window.JSON5;
+
 // Export uživatelského scope do JSON (pro textarea)
 export function exportUserScope(scopeName) {
   const scope = state.user?.[scopeName];
   if (!scope) {
-    // console.warn(`Scope '${scopeName}' neexistuje.`);
+    console.warn(`Scope '${scopeName}' neexistuje.`);
     return '';
   }
   const obj = { [scopeName]: scope };
   return serialize(obj);
 }
 
-// Import uživatelského scope z JSON (textarea)
+
 export function importUserScope(text) {
-  let obj = null;
-
-  // Zkusíme JSON
+  text = '{ ' + text + ' }';
+  console.log(text);
+  const vstup = JSON5.parse(text);
+  // const scope = state.user?.[scopeName];
   try {
-    obj = deserialize(text);
-    // console.log('Načteno jako JSON/deserialize.');
-  } catch (jsonErr) {
-    // Pokud JSON selže, zkusíme JS objekt literal
-    try {
-      obj = (new Function('return {' + text + '}'))();
-      // console.log('Načteno jako JavaScript literal.');
-    } catch (jsErr) {
-      // console.error('Chyba při importu:', jsErr.message);
-      return false;
-    }
-  }
-
-  if (typeof obj !== 'object' || obj === null) {
-    // console.warn('Neplatný formát.');
-    return false;
-  }
-
-  Object.entries(obj).forEach(([name, scope]) => {
+    Object.entries(vstup).forEach(([name, scope]) => {
     state.user[name] = scope;
   });
-
-  // console.log('Import úspěšný:', Object.keys(obj));
-  return true;
+    // state.user += vstup;
+  }
+  catch (err) {
+    console.warn('ERROR na: ', err);
+    }
 }
