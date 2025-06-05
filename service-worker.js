@@ -6,6 +6,7 @@ const URLS_TO_CACHE = [
   '/css/styl.css',
   '/js/events.js',
   '/js/importexport.js',
+  '/js/json5.js',
   '/js/keyboard.js',
   '/js/lang.js',
   '/js/layout.js',
