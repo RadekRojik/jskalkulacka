@@ -121,47 +121,6 @@ export class SmartDataParser {
     }
   }
 
-  // Detekce jednoduchého formátu (klíč: hodnota nebo funkce)
-  // isSimpleFormat(str) {
-  //   const lines = str.split('\n').filter(line => {
-  //     const trimmed = line.trim();
-  //     return trimmed && !trimmed.startsWith('#');
-  //   })
-
-  //   if (lines.length === 0) return false;
-
-  //   // Kontrola, zda to vypadá jako jednoduchý formát
-  //   let hasValidLines = false;
-
-  //   for (const line of lines) {
-  //     const trimmed = line.trim();
-  //     if (!trimmed) continue;
-
-  //     // Řádek s dvojtečkou (klíč: hodnota)
-  //     if (trimmed.includes(':')) {
-  //       hasValidLines = true;
-  //       continue;
-  //     }
-
-  //     // Definice funkce bez klíče (obsahuje = a název funkce)
-  //     if (this.isFunctionDefinition(trimmed)) {
-  //       hasValidLines = true;
-  //       continue;
-  //     }
-
-  //     // Řádek který začíná mezerou (indentace) je také OK
-  //     if (line.match(/^\s+/)) {
-  //       hasValidLines = true;
-  //       continue;
-  //     }
-
-  //     // Pokud najdeme řádek který nepatří, není to jednoduchý formát
-  //     return false;
-  //   }
-
-  //   return hasValidLines;
-  // }
-
   // Parser pro pseudo-JSON formát (složené závorky s jednoduchým obsahem)
   parsePseudoJson(text) {
     // Odstranit vnější složené závorky
@@ -329,24 +288,7 @@ export class SmartDataParser {
     };
   }
 
-  // Konverze objektu zpět na jednoduchý formát
-  // toSimpleFormat(obj, indent = 0) {
-  //   const spaces = '  '.repeat(indent)
-  //   let result = ''
-
-  //   for (const [key, value] of Object.entries(obj)) {
-  //     if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
-  //       result += `${spaces}${key}:\n`
-  //       result += this.toSimpleFormat(value, indent + 1)
-  //     } else {
-  //       result += `${spaces}${key}: ${this.valueToString(value)}\n`
-  //     }
-  //   }
-
-  //   return result
-  // }
-
-  // Parsování jednotlivých hodnot
+   // Parsování jednotlivých hodnot
   parseValue(valueStr) {
     // Objekt ve složených závorkách
     if (valueStr.startsWith('{') && valueStr.endsWith('}')) {

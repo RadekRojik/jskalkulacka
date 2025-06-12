@@ -78,9 +78,6 @@ export function loadState(obj, keys) {
 }
 
 
-
-
-
 export const state = createDeepProxy(innerState, saveToLocal);
 // Object.freeze(state.user.basic);
 loadState(state, watchprops);
@@ -131,8 +128,6 @@ function createDeepProxy(obj, callback, rootKey = null) {
       return value;
     },
     set(target, prop, value) {
-      // console.log('** ', target);
-      // console.log('*** ', prop);
       const result = Reflect.set(target, prop, value);
       const key = rootKey || prop;
       if (watchprops.includes(key)) callback(key);

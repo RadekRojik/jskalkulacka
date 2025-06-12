@@ -29,11 +29,25 @@ function insertText(hodnota) {
   state.altSymbol = false;
 };
 
+
+function saveToObjekt(hod){
+  // state.user[state.activeUserScope][hod.name] = vstup.textContent.trim();
+  Reflect.set(state.user[state.activeUserScope], hod.name, vstup.textContent.trim());
+  initKeyboard(kontejner);
+}
+
+
 function insertValue(hod){
-  smaz();
+  if (/\d$/.test(vstup.textContent.trim())) smaz();
   insertText(hod);
+}
+
+
+function insertAndMakeResult(hod){
+  insertValue(hod);
   makeResult();
 }
+
 
 // wraper na skok do nastavení
 function goToNastaveni() {
@@ -54,30 +68,31 @@ function smaz() {
 }
 
 function saveMemory(x){
-  // console.log(x);
   state.memory[x.name] = vstup.textContent;
+  initKeyboard(kontejner);
 }
 
 function loadMemory(x) {
+  const kuk = {};
   vstup.textContent = state.memory[x.name];
 }
 
 export function vratAns(){
   const tohle = {};
   tohle.name1 = state.ans[0];
-  // console.log(state.ans);
   insertText(tohle);
 }
 
 export function zmenScope(){
   state['activeUserScope'] = walkTroughObject(state.user, state.activeUserScope, 1);
-  //loadState(state, watchprops);
 }
 
 
 const funkce = {
   insertText,
   insertValue,
+  insertAndMakeResult,
+  saveToObjekt,
   makeResult,
   smaz,
   del,
@@ -95,7 +110,5 @@ initEventHandlers({
   zmenLayout,
 });
 
-// kontejner ? vykresliKlavesnici("default", kontejner) : null;
 initKeyboard(kontejner); // místo přímého vykreslení
-// nastavTrigRezim(state.pamet, state.angle);
 reloadstatus();
