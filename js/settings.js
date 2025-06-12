@@ -1,9 +1,12 @@
 import { exportUserScope, importUserScope } from './importexport.js';
-import { state, saveToLocal } from "./state.js";
+import { state, saveToLocal, walkTroughObject } from "./state.js";
 import { cyklickeTema, mod_uhly } from "./theming.js";
 import { reloadstatus } from "./statusbar.js";
+// import { zmenScope } from './logika.js';
 
 const math = window.math;
+
+const userjson = document.getElementById('userJson');
 
 // Skok na index.html
 function goToIndex() {
@@ -40,32 +43,57 @@ function vypisVzorce() {
   document.getElementById('pamet').innerHTML = html;
 }
 
+function delItem(item){
+  delete state.user[state.activeUserScope][item];
+  document.getElementById('pamet').innerHTML = vypisObjektu(state.user, state.activeUserScope);
+}
 
-// Tlačítka
+function vypisObjektu(obj, item){
+  const klice = Object.keys(obj[item]);
+  let html = `<h4>${item}</h4>`;
+  klice.forEach((key) => {
+    html += `<div>${key} : ${obj[item][key]}<button onclick="delItem('${key}')">Delete</button><div>`;
+  });
+  return html;
+}
+
+
+// Spouštěcí tabulka tlačítek
 const tabulka = {
   btnTema: cyklickeTema,
   uhly: () => { mod_uhly();},
   ukapamet: vypisVzorce,
   zpet: goToIndex,
-  importBtn: () => { const text = document.getElementById('userJson').value;
+  importBtn: () => {
+    const text = userjson.value;
     if (importUserScope(text)) {
       alert('Import proběhl.');
     }},
   exportBtn: () => {
-  const scopeName = document.getElementById('scopeName').value.trim();
-  const json = exportUserScope(scopeName);
-  document.getElementById('userJson').value = json || '';
-},
+  // const scopeName = document.getElementById('scopeName').value.trim();
+  const json = exportUserScope(state.activeUserScope);
+  userjson.value = json || '';
+  userjson.dispatchEvent(new Event('input'));
+  },
+scope: () => {
+  state['activeUserScope'] = walkTroughObject(state.user, state.activeUserScope, 1);
+  document.getElementById('pamet').innerHTML = vypisObjektu(state.user, state.activeUserScope);},
 }
 
 function dispatch(event, table) {
+  if (!event.target.closest("button")) return;
   if (Object.keys(table).includes(event.target.id)) {
     table[event.target.id](event);
   }
 }
 
 document.addEventListener('click', e => { dispatch(e, tabulka); });
+userjson.addEventListener('input', function(){
+  this.style.height = this.scrollHeight + 'px';
+});
 
 reloadstatus();
 window.smazVzorec = smazVzorec;
-vypisVzorce();
+window.delItem = delItem;
+// vypisVzorce();
+document.getElementById('pamet').innerHTML = vypisObjektu(state.user, state.activeUserScope);

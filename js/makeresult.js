@@ -1,6 +1,7 @@
 /// <reference path="./types.d.ts" />
 
 import { state, loadState, watchprops } from "./state.js";
+import { SmartDataParser } from "./importexport.js";
 
 const math = window.math;
 math.config({number: 'BigNumber'});
@@ -9,17 +10,25 @@ math.config({number: 'BigNumber'});
 // funkce vyhodnocující výraz
 export function makeResult() {
   const activeScope = state.activeUserScope ? state.user[state.activeUserScope] : {};
-  const scope = { ...state.pamet, ...activeScope };
+  const scope = { ...state.pamet, ...state.user.basic, ...activeScope };
+
+  let node = {};
+  let vysledek;
 
   try {
     const vyraz = vstup.textContent
       .replace(/\u00A0/g, ' ')
       .replace(/✕/g, '*')
       .replace(/√/g, 'sqrt')
+      .replace(/π/g, 'pi')
       .trim();
-    const node = math.parse(vyraz);
-    let vysledek;
- 
+      node = math.parse(vyraz);
+  //  Přidat později na parsování vstup sady hodnot
+  //   }catch(e){
+  // console.log("je to na prd", node);
+  //   console.log(e);
+  // };
+  // try {
     switch (node.type) {
       case 'SymbolNode':
         if (typeof activeScope[node.name] === 'string') {
@@ -32,14 +41,16 @@ export function makeResult() {
         
         break;
       case 'AssignmentNode':
-        testAns(node.toString(), state.vzorce, state.mem);
+        insertAssigmentToObjekt(node.toString(), state.user);
+        // testAns(node.toString(), state.vzorce, state.mem);
         vysledek = node.evaluate(scope);
         vysledek = math.format(vysledek, state.outFormat);
         math.evaluate(vysledek, scope);
         vysledek = 0;
         break;
       case 'FunctionAssignmentNode':
-        testAns(node.toString(), state.vzorce, state.mem);
+        insertFnToObjekt(node.toString(), state.user);
+        // testAns(node.toString(), state.vzorce, state.mem);
         vysledek = math.evaluate(vyraz, scope);
         vysledek = math.format(vysledek, state.outFormat);
         vysledek = 0;
@@ -64,6 +75,7 @@ export function makeResult() {
         break;
       default:  vysledek = node.evaluate(scope);
     }
+    vysledek = math.round(vysledek, state.DES_MIST);
     vstup.textContent = String(vysledek ?? 0);
     if (vstup.textContent != 0) pridejDoAns(state.ans, vstup.textContent, state.ANS_HISTORY);
     state.mazat = true;
@@ -77,17 +89,50 @@ export function makeResult() {
 
 function pridejDoAns(pole, prvek, maxDelka) {
   pole.unshift(prvek);
-  // console.log('přidávám ', prvek);
   while (pole.length > maxDelka) {
     pole.pop();
   }
 }
 
+function insertFnToObjekt(str, objekt){
+  const scope = state.activeUserScope;
+  str = str.trim();
+  const parser = new SmartDataParser();
+  const nazevVzorce = parser.extractFunctionName(str);
+  try {
+    Reflect.set(objekt[scope], nazevVzorce, str);
+    math.evaluate(str, state.pamet);
+  } catch(err) {
+    console.warn('Chybný vzorec ', err.message);
+  }
+}
+
+function insertAssigmentToObjekt(str, objekt){
+  const scope = state.activeUserScope;
+  let [key, value] = str.split('=');
+  key = key.trim();
+  value = value.trim();
+  // if (value === 'null') {
+  //   if ( key in objekt[scope]){
+  //     delete objekt[scope][key];
+  //     return;}
+  // }
+  try {
+    // if (scope === 'basic') {
+    //   testAns(str, state.vzorce, state.mem);
+    //   return;
+    // }
+    Reflect.set(objekt[scope], key, value);
+    math.evaluate(str, state.pamet);
+  } catch (err) {
+    console.warn('Chybný výraz ', err.message);
+  }
+}
+
+
 function testAns(str, pole, maxDelka) {
-  // console.log('Jsem v testAns ', str);
   const match = str.match(/^[a-z\d]+/i);
   if (!match) return pole;
-
   const klic = match[0];
 
   for (let i = 0; i < pole.length; i++) {

@@ -1,4 +1,4 @@
-import { state, innerState } from "./state.js";
+import { state } from "./state.js";
 
 export function reloadstatus (){
   const statusbar = document?.getElementById("statusbar");
@@ -6,5 +6,5 @@ export function reloadstatus (){
   const uhly = document?.getElementById("uhly");
   // console.log('přepisuju statusbar');
   if (uhly) uhly.innerText = 'Mod: ' + state.angle;
-  if (scope) scope.innerText = 'Scope: ' + state.activeUserScope;
+  if (scope) scope.innerText = 'Scope: ' + state?.activeUserScope;
 }

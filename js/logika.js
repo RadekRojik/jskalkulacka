@@ -29,6 +29,10 @@ function insertText(hodnota) {
   state.altSymbol = false;
 };
 
+function insertValue(hod){
+  insertText(hod);
+  makeResult();
+}
 
 // wraper na skok do nastavení
 function goToNastaveni() {
@@ -48,6 +52,15 @@ function smaz() {
   state.mazat = false;
 }
 
+function saveMemory(x){
+  // console.log(x);
+  state.memory[x.name] = vstup.textContent;
+}
+
+function loadMemory(x) {
+  vstup.textContent = state.memory[x.name];
+}
+
 export function vratAns(){
   const tohle = {};
   tohle.name1 = state.ans[0];
@@ -63,6 +76,7 @@ export function zmenScope(){
 
 const funkce = {
   insertText,
+  insertValue,
   makeResult,
   smaz,
   del,
@@ -70,6 +84,8 @@ const funkce = {
   goToNastaveni,
   vratAns,
   zmenScope,
+  saveMemory,
+  loadMemory
 };
 
 initEventHandlers({

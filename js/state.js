@@ -1,6 +1,10 @@
 import { reloadstatus } from "./statusbar.js";
 
-export const innerState = {
+// const READONLY = Symbol("Read only object");
+
+// const USER_DEFAULT = Object.freeze({basic: {READONLY: true}});
+
+const innerState = {
   tema: 'light',
   keyboardlayout: 'default',
   treshold: 50,
@@ -15,18 +19,23 @@ export const innerState = {
   activeUserScope: 'basic',
   ans: [],
   pamet: {},
-  vzorce: [],
+  memory: {},
   user: {
+    // ...USER_DEFAULT,
     basic: {}
+    //   [READONLY]: true
+    // }
   }
 };
+
+// console.log(innerState.user.basic);
 
 export const temata = ["light", "dark", "ocean"];
 export const rezimyUhlu = ['rad', 'deg', 'grad'];
 
 export const watchprops = ['activeUserScope', 'ans', 'ANS_HISTORY',
   'DES_MIST', 'tema', 'angle', 'treshold', 'timehold',
-  'keyboardlayout', 'vzorce', 'user'];
+  'keyboardlayout', 'memory', 'user'];
 
 
 export function saveToLocal(key) {
@@ -49,7 +58,7 @@ export function loadState(obj, keys) {
     const val = localStorage.getItem(k);
     if (val !== null && val !== 'undefined') {
       try {
-        obj[k] = deserialize(val);
+        Reflect.set(obj, k, deserialize(val));
         // math.import(obj[k]);
         if (k === 'vzorce' && Array.isArray(obj[k])) {
           obj[k].forEach(expr => {
@@ -62,17 +71,20 @@ export function loadState(obj, keys) {
         }
 
       } catch {
-        obj[k] = isNaN(val) ? val : Number(val);
+        Reflect.set(obj, k, isNaN(val) ? val : Number(val));
       }
     }
   });
 }
 
 
-loadState(innerState, watchprops);
+
 
 
 export const state = createDeepProxy(innerState, saveToLocal);
+// Object.freeze(state.user.basic);
+loadState(state, watchprops);
+
 
 export function walkTroughArray(array, item, step) {
   const index = array.indexOf(item);
@@ -119,6 +131,8 @@ function createDeepProxy(obj, callback, rootKey = null) {
       return value;
     },
     set(target, prop, value) {
+      // console.log('** ', target);
+      // console.log('*** ', prop);
       const result = Reflect.set(target, prop, value);
       const key = rootKey || prop;
       if (watchprops.includes(key)) callback(key);
@@ -136,3 +150,4 @@ function createDeepProxy(obj, callback, rootKey = null) {
 
 window.scop = innerState;
 window.des = deserialize;
+window.state = state;
