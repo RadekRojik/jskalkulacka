@@ -30,6 +30,7 @@ function insertText(hodnota) {
 };
 
 function insertValue(hod){
+  smaz();
   insertText(hod);
   makeResult();
 }
