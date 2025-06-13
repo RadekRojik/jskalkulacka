@@ -14,7 +14,7 @@ const kontejner = document.getElementById("klavesnice");
 
 // vkládá znaky na displej
 function insertText(hodnota) {
-  const znamenka = ["+", "-", "*", "/", "✕"];
+  const znamenka = ["+", "-", "*", "/", "✕", ","];
   const kvlstr = state.altSymbol ? hodnota?.str1 : hodnota?.str;
   const kvlnam = state.altSymbol ? hodnota?.name1 : hodnota?.name;
   const kvlozeni = kvlstr ? kvlstr : kvlnam;
