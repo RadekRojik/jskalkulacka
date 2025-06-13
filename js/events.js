@@ -102,7 +102,7 @@ export function initEventHandlers({ container, dispatchTable, zmenLayout }) {
         if (Math.abs(deltaX) > Math.abs(deltaY)) {
           zmenLayoutRef(deltaX < 0 ? -1 : 1);
         } else {
-          deltaY < 0 ? funkce.makeResult() : funkce.insertText({ name: '+' });
+          deltaY < 0 ? funkce.insertText({ name: '*' }) : funkce.insertText({ name: '+' });
         }
       }
     }, { passive: false });
