@@ -44,7 +44,17 @@ function insertValue(hod){
 
 
 function insertAndMakeResult(hod){
-  insertValue(hod);
+  const scope = {};
+  const vzorec = state.user[state.activeUserScope][hod.name];
+  const node = math.parse(vzorec);
+  node.compile().evaluate(scope);
+  const pocetarg = node.params.length;
+  const pole = vstup.textContent.split(',').map(s => s.trim());
+  if (pole.length == pocetarg){
+    vstup.textContent = `${hod.name}(${pole})`;
+  } else {
+    insertValue(hod);
+  }
   makeResult();
 }
 

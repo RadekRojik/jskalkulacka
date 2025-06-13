@@ -11,7 +11,7 @@ math.config({number: 'BigNumber'});
 export function makeResult() {
   const activeScope = state.activeUserScope ? state.user[state.activeUserScope] : {};
   const scope = { ...state.pamet, ...state.user.basic, ...activeScope };
-
+  // console.log(scope);
   let node = {};
   let vysledek;
 
