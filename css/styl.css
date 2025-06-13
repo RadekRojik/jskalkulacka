@@ -70,6 +70,10 @@ hr {
   flex: 1;
 }
 
+.nekostka {
+  flex: 0;
+}
+
 #vstup,
 #vystup {
   font-size: calc(var(--velikost-pisma) * 1.1);
