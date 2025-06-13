@@ -44,6 +44,11 @@ function insertValue(hod){
 
 
 function insertAndMakeResult(hod){
+  if (vstup.textContent.trim() == 0 || vstup.textContent.trim() == ''){
+    insertValue(hod);
+    makeResult();
+    return;
+  }
   const scope = {};
   const vzorec = state.user[state.activeUserScope][hod.name];
   const node = math.parse(vzorec);
