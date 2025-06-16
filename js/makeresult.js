@@ -75,16 +75,28 @@ export function makeResult() {
         break;
       default:  vysledek = node.evaluate(scope);
     }
-    vysledek = math.round(vysledek, state.DES_MIST);
-    vstup.textContent = String(vysledek ?? 0);
+    vysledek = myEvaluate(vysledek, state.DES_MIST);
+    vysledek = vysledek.toString();
+    vstup.textContent = vysledek;
     if (vstup.textContent != 0) pridejDoAns(state.ans, vstup.textContent, state.ANS_HISTORY);
     state.mazat = true;
-    //loadState(state, watchprops);
   } catch (err) {
     vstup.textContent = `ERR: ${err.message}`;
     state.mazat = true;
   }
 }
+
+function myEvaluate(result, precision) {
+        if (result && result.units) {
+        const str = result.toString();
+        const unit = str.match(/[a-zA-Z]+$/)?.[0];
+        if (unit) {
+            result = math.round(result, precision, math.unit(unit));
+        }} else {
+          result = math.round(result, precision);
+        }
+  return result;
+    }
 
 
 function pridejDoAns(pole, prvek, maxDelka) {
