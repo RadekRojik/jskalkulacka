@@ -4,7 +4,8 @@
 
 ---
 
-## 🇨🇿 Čeština {#cz}
+<a name="cz"></a>
+## 🇨🇿 CZ
 
 Praktická kalkulačka pro „pracující lidi“, která umožní tvořit vlastní **scopy** (prostory) s proměnnými a vzorci, rychle je používat, sdílet a mít je vždy po ruce i **offline**.
 
@@ -112,7 +113,8 @@ Praktická kalkulačka pro „pracující lidi“, která umožní tvořit vlast
 
 ---
 
-## 🇩🇪 Deutsch {#de}
+<a name="de"></a>
+## 🇩🇪 DE
 
 Praktischer Rechner für „arbeitende Menschen“, mit dem man eigene **Scopes** (Bereiche) mit Variablen und Formeln erstellen, schnell benutzen, teilen und auch **offline** verfügbar haben kann.
 
