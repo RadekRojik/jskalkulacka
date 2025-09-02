@@ -25,6 +25,8 @@ Praktická kalkulačka pro „pracující lidi“, která umožní tvořit vlast
 
 ### 2) Instalace & spuštění
 
+[Kalkulačka](https://radekrojik.github.io/jskalkulacka/index.html)
+
 #### Android
 1. Otevři kalkulačku v **Chrome** nebo **Edge**.
 2. V nabídce vyber **Přidat na plochu**.
@@ -133,6 +135,8 @@ Praktischer Rechner für „arbeitende Menschen“, mit dem man eigene **Scopes*
 ---
 
 ### 2) Installation & Start
+
+[Rechner](https://radekrojik.github.io/jskalkulacka/index.html)
 
 #### Android
 1. Rechner in **Chrome** oder **Edge** öffnen.
