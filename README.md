@@ -25,7 +25,10 @@ Praktická kalkulačka pro „pracující lidi“, která umožní tvořit vlast
 
 ### 2) Instalace & spuštění
 
-[Kalkulačka](https://radekrojik.github.io/jskalkulacka/index.html)
+[Kalkulačka - Github](https://radekrojik.github.io/jskalkulacka/index.html)
+[![GitHub Pages](https://img.shields.io/badge/Live-GitHub%20Pages-24292e?logo=github&logoColor=white)](https://radekrojik.github.io/jskalkulacka/)
+[![Codeberg Pages](https://img.shields.io/badge/Live-Codeberg%20Pages-2185d0?logo=gitea&logoColor=white)](https://ramael.codeberg.page/jscalc/)
+
 
 #### Android
 1. Otevři kalkulačku v **Chrome** nebo **Edge**.
