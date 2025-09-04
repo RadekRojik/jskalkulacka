@@ -25,8 +25,8 @@ Praktická kalkulačka pro „pracující lidi“, která umožní tvořit vlast
 
 ### 2) Instalace & spuštění
 
-[Kalkulačka - Github](https://radekrojik.github.io/jskalkulacka/index.html)
 [![GitHub Pages](https://img.shields.io/badge/Live-GitHub%20Pages-24292e?logo=github&logoColor=white)](https://radekrojik.github.io/jskalkulacka/)
+
 [![Codeberg Pages](https://img.shields.io/badge/Live-Codeberg%20Pages-2185d0?logo=gitea&logoColor=white)](https://ramael.codeberg.page/jscalc/)
 
 
@@ -139,7 +139,9 @@ Praktischer Rechner für „arbeitende Menschen“, mit dem man eigene **Scopes*
 
 ### 2) Installation & Start
 
-[Rechner](https://radekrojik.github.io/jskalkulacka/index.html)
+[![GitHub Pages](https://img.shields.io/badge/Live-GitHub%20Pages-24292e?logo=github&logoColor=white)](https://radekrojik.github.io/jskalkulacka/)
+
+[![Codeberg Pages](https://img.shields.io/badge/Live-Codeberg%20Pages-2185d0?logo=gitea&logoColor=white)](https://ramael.codeberg.page/jscalc/)
 
 #### Android
 1. Rechner in **Chrome** oder **Edge** öffnen.
