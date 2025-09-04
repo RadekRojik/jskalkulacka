@@ -1,0 +1,13 @@
+pipeline:
+  pages:
+    image: alpine
+    commands:
+      - apk add --no-cache rsync
+      - rsync -av --delete ./ /output/
+    when:
+      branch: main
+
+deploy:
+  image: woodpeckerci/plugin-pages
+  settings:
+    target: codeberg
